@@ -1,0 +1,220 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Shop;
+use App\Models\Product;
+
+class ShopController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $shop = app('shop');
+
+        if (!$shop) {
+            abort(404);
+        }
+
+        $page = $shop->pages()->where('slug', 'accueil')->first();
+        $productsQuery = Product::where('shop_id', $shop->id)->where('is_active', true);
+
+        $currentCategory = null;
+        $categorySlug = $request->query('category');
+        if ($categorySlug) {
+            $currentCategory = $shop->categories()->where('slug', $categorySlug)->where('is_active', true)->first();
+            if ($currentCategory) {
+                $productsQuery->where('category_id', $currentCategory->id);
+            }
+        }
+
+        $products = $productsQuery->get();
+        $components = $shop->components()->where('is_active', true)->orderBy('order')->get();
+
+        return view('shop.index', [
+            'shop' => $shop,
+            'page' => $page,
+            'products' => $products,
+            'components' => $components,
+            'currentCategory' => $currentCategory,
+        ]);
+    }
+
+    // public function page(string $slug): View
+    // {
+    //     $shop = app('shop');
+        
+    //     if (!$shop) {
+    //         abort(404);
+    //     }
+
+    //     $page = $shop->pages()
+    //         ->where('slug', $slug)
+    //         ->where('is_active', true)
+    //         ->firstOrFail();
+
+    //     // Si c'est la page "Boutique", charger les produits
+    //     $products = null;
+    //     if ($slug === 'boutique') {
+    //         $products = $shop->products()
+    //             ->where('is_active', true)
+    //             ->orderBy('created_at', 'desc')
+    //             ->get();
+    //     }
+
+    //     return view('shop.page', [
+    //         'shop' => $shop,
+    //         'page' => $page,
+    //         'products' => $products,
+    //     ]);
+    // }
+    public function showProduct(string $subdomain, string $id): View
+    {
+        Log::info('showProduct called with subdomain: ' . $subdomain . ', id: ' . $id);
+        
+        // Charger la boutique
+        $shop = Shop::where('subdomain', $subdomain)
+            ->where('status', 'active')
+            ->first();
+            
+        Log::info('Shop found: ' . ($shop ? $shop->id : 'null'));
+        
+        if (!$shop) {
+            Log::error('Shop not found for subdomain: ' . $subdomain);
+            abort(404);
+        }
+
+        // Charger le produit
+        $productId = (int) $id;
+        $product = Product::where('id', $productId)
+            ->where('shop_id', $shop->id)
+            ->where('is_active', true)
+            ->first();
+            
+        Log::info('Product found: ' . ($product ? $product->id : 'null'));
+
+        if (!$product) {
+            Log::error('Product not found or not active', [
+                'product_id' => $productId,
+                'shop_id' => $shop->id
+            ]);
+            abort(404);
+        }
+        
+        Log::info('Product validation passed');
+
+        // Produits similaires
+        $relatedProducts = Product::where('shop_id', $shop->id)
+            ->where('is_active', true)
+            ->where('id', '!=', $product->id)
+            ->limit(4)
+            ->get();
+
+        return view('shop.product-show', [
+            'shop' => $shop,
+            'product' => $product,
+            'relatedProducts' => $relatedProducts,
+        ]);
+    }
+    
+    public function checkout()
+    {
+        $shop = app('shop');
+        
+        if (!$shop) {
+            abort(404);
+        }
+        
+        $cartItems = \App\Models\Cart::getCartItems(Auth::id());
+        
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('shop.index', ['subdomain' => $shop->subdomain])->with('error', 'Votre panier est vide.');
+        }
+        
+        $subtotal = 0;
+        foreach ($cartItems as $item) {
+            $subtotal += $item->product->price * $item->quantity;
+        }
+        
+        $shippingCost = 0; // Free shipping for now
+        $totalPrice = $subtotal + $shippingCost;
+        
+        return view('shop.checkout', [
+            'shop' => $shop,
+            'cartItems' => $cartItems,
+            'subtotal' => $subtotal,
+            'shippingCost' => $shippingCost,
+            'totalPrice' => $totalPrice,
+        ]);
+    }
+    
+    public function processOrder(Request $request)
+    {
+        $shop = app('shop');
+        
+        if (!$shop) {
+            abort(404);
+        }
+        
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'city' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
+            'payment_method' => 'required|in:card,paypal',
+        ]);
+        
+        $cartItems = \App\Models\Cart::getCartItems(Auth::id());
+        
+        if ($cartItems->isEmpty()) {
+            return redirect()->back()->withErrors(['error' => 'Votre panier est vide.']);
+        }
+        
+        // Calculate total
+        $subtotal = 0;
+        foreach ($cartItems as $item) {
+            $subtotal += $item->product->price * $item->quantity;
+        }
+        
+        $shippingCost = 0; // Free shipping for now
+        $totalPrice = $subtotal + $shippingCost;
+        
+        // Here you would typically create an order in the database
+        // For now, we'll just clear the cart and redirect to a confirmation page
+        \App\Models\Cart::clearCart(Auth::id());
+        
+        return redirect()->route('shop.index', ['subdomain' => $shop->subdomain])
+            ->with('success', 'Votre commande a été passée avec succès! Nous vous avons envoyé un email de confirmation.');
+    }
+    
+    public function showPage(string $subdomain, string $slug)
+    {
+        $shop = app('shop');
+        
+        if (!$shop) {
+            abort(404);
+        }
+        
+        $page = $shop->pages()->where('slug', $slug)->where('is_active', true)->first();
+        
+        if (!$page) {
+            abort(404);
+        }
+        
+        // Load products if this page should display them
+        $products = $shop->products()->where('is_active', true)->get();
+        
+        return view('shop.page', [
+            'shop' => $shop,
+            'page' => $page,
+            'products' => $products,
+        ]);
+    }
+}
