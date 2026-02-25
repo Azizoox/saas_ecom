@@ -397,7 +397,7 @@
   
 
     <!-- Hero Section -->
-    <div class="hero-section">
+    <!-- <div class="hero-section">
         <div class="container">
             <div class="hero-content fade-in-up">
                 <?php if($shop->logo): ?>
@@ -415,54 +415,9 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Features Section -->
-    <div class="features-section">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="bi bi-truck"></i>
-                        </div>
-                        <h3 class="feature-title">Livraison rapide</h3>
-                        <p class="text-muted">Livraison à domicile en 24-48h</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <h3 class="feature-title">Paiement sécurisé</h3>
-                        <p class="text-muted">Transactions 100% sécurisées</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="bi bi-arrow-clockwise"></i>
-                        </div>
-                        <h3 class="feature-title">Retour gratuit</h3>
-                        <p class="text-muted">30 jours pour changer d'avis</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="bi bi-headset"></i>
-                        </div>
-                        <h3 class="feature-title">Support 24/7</h3>
-                        <p class="text-muted">Service client disponible</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dynamic Components Builder -->
-    <?php $__currentLoopData = $components; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $component): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    </div> -->
+    <?php $components = $shop->components()->where('type', '!=', 'banner')->get(); ?>
+       <?php $__currentLoopData = $components; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $component): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
         <?php echo $__env->make('shop.components.' . $component->type, [
             'id' => $component->id,
             'content' => $component->content,
@@ -471,40 +426,12 @@
         ], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-    <!-- Category Navigation -->
-    <?php if($shop->categories()->where('is_active', true)->count() > 0): ?>
-    <div class="container mb-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 d-flex align-items-center">
-                    <i class="bi bi-tags me-2 text-primary"></i>
-                    <span>Filtrer par catÃ©gorie</span>
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="<?php echo e(route('shop.index', ['subdomain' => $shop->subdomain])); ?>" 
-                       class="btn btn-sm <?php echo e(!$currentCategory ? 'btn-primary' : 'btn-outline-primary'); ?>">
-                        <i class="bi bi-grid me-1"></i> Tous les produits
-                    </a>
-                    <?php $__currentLoopData = $shop->categories()->where('is_active', true)->orderBy('order')->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <a href="<?php echo e(route('shop.index', ['subdomain' => $shop->subdomain, 'category' => $category->slug])); ?>" 
-                           class="btn btn-sm <?php echo e(($currentCategory && $currentCategory->id === $category->id) ? 'btn-primary' : 'btn-outline-primary'); ?>">
-                            <i class="bi bi-tag me-1"></i> <?php echo e($category->name); ?>
+ 
 
-                            <?php
-                                $productCount = $category->products()->where('is_active', true)->count();
-                            ?>
-                            <?php if($productCount > 0): ?>
-                                <span class="badge bg-white text-primary ms-1"><?php echo e($productCount); ?></span>
-                            <?php endif; ?>
-                        </a>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
+    <!-- Dynamic Components Builder -->
+
+
+
 
     <!-- Products Section -->
     <div class="container" id="products">
@@ -599,6 +526,50 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         <?php endif; ?>
+    </div>
+
+       <!-- Features Section -->
+    <div class="features-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <h3 class="feature-title">Livraison rapide</h3>
+                        <p class="text-muted">Livraison à domicile en 24-48h</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3 class="feature-title">Paiement sécurisé</h3>
+                        <p class="text-muted">Transactions 100% sécurisées</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </div>
+                        <h3 class="feature-title">Retour gratuit</h3>
+                        <p class="text-muted">30 jours pour changer d'avis</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <h3 class="feature-title">Support 24/7</h3>
+                        <p class="text-muted">Service client disponible</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Footer -->

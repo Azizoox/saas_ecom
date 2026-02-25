@@ -142,10 +142,10 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 form-check">
+                        <div class="mb-3 form-check ">
                             <input type="checkbox" class="form-check-input" id="is_active" name="is_active" 
                                    {{ old('is_active', true) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">
+                            <label class="form-check-label " style="display: none;" for="is_active">
                                 Catégorie active
                             </label>
                         </div>

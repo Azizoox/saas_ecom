@@ -1,5 +1,20 @@
 <?php $__env->startSection('title', 'Gestion des produits'); ?>
 
+<?php $__env->startPush('styles'); ?>
+<style>
+    .delete-modal-content { border-radius: 16px; overflow: hidden; }
+    .delete-modal-icon-wrap {
+        width: 56px; height: 56px; border-radius: 50%;
+        background: rgba(239, 68, 68, 0.12); color: #ef4444;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; margin: 0 auto;
+    }
+    .delete-modal-content .modal-title { font-weight: 700; font-size: 1.1rem; }
+    .delete-modal-content .btn-delete-confirm { border-radius: 10px; font-weight: 600; padding: 0.6rem 1rem; }
+    .delete-modal-content .btn-outline-secondary { border-radius: 10px; }
+</style>
+<?php $__env->stopPush(); ?>
+
 <?php $__env->startSection('content'); ?>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-box-seam"></i> Mes produits</h2>
@@ -69,10 +84,12 @@
                                     <a href="<?php echo e(route('products.edit', $product)); ?>" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form action="<?php echo e(route('products.destroy', $product)); ?>" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+                                    <form action="<?php echo e(route('products.destroy', $product)); ?>" method="POST" class="d-inline delete-product-form">
                                         <?php echo csrf_field(); ?>
                                         <?php echo method_field('DELETE'); ?>
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-trigger-delete" title="Supprimer"
+                                                data-delete-title="Supprimer ce produit ?"
+                                                data-delete-message="« <?php echo e(e($product->name)); ?> » sera définitivement supprimé. Cette action est irréversible.">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
@@ -99,6 +116,56 @@
         <?php endif; ?>
     </div>
 </div>
+
+
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content delete-modal-content border-0 shadow-lg">
+            <div class="modal-body text-center p-4 p-md-5">
+                <div class="delete-modal-icon-wrap mb-3">
+                    <i class="bi bi-trash3"></i>
+                </div>
+                <h5 class="modal-title mb-2" id="deleteConfirmModalLabel">Supprimer ?</h5>
+                <p class="text-muted small mb-4 delete-modal-message">Cette action est irréversible.</p>
+                <div class="d-flex flex-column gap-2">
+                    <button type="button" class="btn btn-danger btn-delete-confirm">
+                        <i class="bi bi-trash me-2"></i> Supprimer
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+(function() {
+    var deleteModal = document.getElementById('deleteConfirmModal');
+    var deleteModalTitle = deleteModal ? deleteModal.querySelector('#deleteConfirmModalLabel') : null;
+    var deleteModalMessage = deleteModal ? deleteModal.querySelector('.delete-modal-message') : null;
+    var deleteConfirmBtn = deleteModal ? deleteModal.querySelector('.btn-delete-confirm') : null;
+    var formToSubmit = null;
+
+    if (deleteModal && deleteConfirmBtn) {
+        document.querySelectorAll('.btn-trigger-delete').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                formToSubmit = this.closest('form');
+                if (deleteModalTitle) deleteModalTitle.textContent = this.getAttribute('data-delete-title') || 'Supprimer ?';
+                if (deleteModalMessage) deleteModalMessage.textContent = this.getAttribute('data-delete-message') || 'Cette action est irréversible.';
+                (new bootstrap.Modal(deleteModal)).show();
+            });
+        });
+        deleteConfirmBtn.addEventListener('click', function() {
+            if (formToSubmit) formToSubmit.submit();
+            bootstrap.Modal.getInstance(deleteModal).hide();
+            formToSubmit = null;
+        });
+        deleteModal.addEventListener('hidden.bs.modal', function() { formToSubmit = null; });
+    }
+})();
+</script>
+<?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\ahach\OneDrive\Bureau\shoopino\resources\views/products/index.blade.php ENDPATH**/ ?>

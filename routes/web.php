@@ -13,6 +13,8 @@ use App\Http\Controllers\ShopComponentController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\POSController;
+use App\Http\Controllers\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 
 // Test route
@@ -78,10 +80,27 @@ Route::get('/debug-shop/{subdomain}', function($subdomain) {
     }
 });
 
+// Routes Super Admin (email + password, accès dashboard stats globales)
+Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+    Route::get('/dashboard', [SuperAdminController::class, 'index'])->name('dashboard');
+});
+
 // Routes authentifiées (dashboard)
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+    
+    // POS Routes
+    Route::prefix('pos')->group(function () {
+        Route::get('/', [POSController::class, 'index'])->name('pos.index');
+        Route::post('/register/create', [POSController::class, 'createRegister'])->name('pos.register.create');
+        Route::post('/register/open', [POSController::class, 'openRegister'])->name('pos.register.open');
+        Route::post('/register/close', [POSController::class, 'closeRegister'])->name('pos.register.close');
+        Route::get('/orders', [POSController::class, 'orders'])->name('pos.orders');
+        Route::get('/history', [POSController::class, 'history'])->name('pos.history');
+        Route::post('/order', [POSController::class, 'createOrder'])->name('pos.order.create');
+        Route::get('/search/products', [POSController::class, 'searchProducts'])->name('pos.search.products');
+    });
     
     // Routes pour les produits
     Route::resource('products', ProductController::class);

@@ -86,6 +86,6 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard.index', ['subdomain' => $shop->subdomain]);
+        return redirect()->route('dashboard');
     }
 }

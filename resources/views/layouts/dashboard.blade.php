@@ -13,6 +13,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="icon" href="{{ asset('images/img.jpg') }}" type="image/x-icon">
     
     <!-- Tailwind CSS for settings page -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -75,8 +76,27 @@
         }
         
         .sidebar-nav {
-            padding: 1.5rem 0;
-        }
+    padding: 1.5rem 0;
+    overflow-y: auto;
+    max-height: calc(100vh - 80px);
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
         
         .nav-item {
             margin: 0.25rem 1rem;
@@ -84,7 +104,7 @@
         
         .sidebar .nav-link {
             color: #cbd5e1;
-            padding: 0.75rem 1rem;
+            padding: 0.65rem 0.95rem;
             border-radius: 0.5rem;
             margin-bottom: 0.25rem;
             transition: var(--transition);
@@ -232,13 +252,32 @@
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <h4>
-                    <i class="bi bi-shop"></i>
+                    <!-- <i class="bi bi-shop"></i> -->
+                    <img src="{{ asset('images/img.jpg') }}" alt="" width="55" height="55" class="rounded-circle">
+                    
                     <span class="brand-text">Shoopino</span>
                 </h4>
             </div>
             
             <div class="sidebar-nav">
                 <ul class="nav flex-column">
+                    @if(auth()->user()->role === 'super_admin')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('super-admin.*') ? 'active' : '' }}" href="{{ route('super-admin.dashboard') }}">
+                            <i class="bi bi-shield-lock"></i>
+                            <span class="nav-text">Super Admin</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mt-4 pt-3 border-top border-gray-700">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="nav-link btn btn-link text-white w-100 text-start border-0 bg-transparent p-0">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span class="nav-text">Déconnexion</span>
+                            </button>
+                        </form>
+                    </li>
+                    @else
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
                             <i class="bi bi-speedometer2"></i>
@@ -306,6 +345,26 @@
                         </a>
                     </li>
                     
+                    <!-- POS Menu Items -->
+                    <li class="nav-item mt-3 pt-3 border-top border-gray-700">
+                        <a class="nav-link {{ request()->routeIs('pos.*') ? 'active' : '' }}" href="{{ route('pos.index') }}">
+                            <i class="bi bi-cash-coin"></i>
+                            <span class="nav-text">Point de Vente</span>
+                        </a>
+                    </li>
+                    <li class="nav-item ms-4">
+                        <a class="nav-link {{ request()->routeIs('pos.orders') ? 'active' : '' }}" href="{{ route('pos.orders') }}">
+                            <i class="bi bi-list-check"></i>
+                            <span class="nav-text">Commandes POS</span>
+                        </a>
+                    </li>
+                    <li class="nav-item ms-4">
+                        <a class="nav-link {{ request()->routeIs('pos.history') ? 'active' : '' }}" href="{{ route('pos.history') }}">
+                            <i class="bi bi-journal-text"></i>
+                            <span class="nav-text">Historique Caisse</span>
+                        </a>
+                    </li>
+                    
                     <li class="nav-item mt-4 pt-3 border-top border-gray-700">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -315,6 +374,7 @@
                             </button>
                         </form>
                     </li>
+                    @endif
                 </ul>
             </div>
         </nav>

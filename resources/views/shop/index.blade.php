@@ -399,7 +399,7 @@
   
 
     <!-- Hero Section -->
-    <div class="hero-section">
+    <!-- <div class="hero-section">
         <div class="container">
             <div class="hero-content fade-in-up">
                 @if($shop->logo)
@@ -417,54 +417,9 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Features Section -->
-    <div class="features-section">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="bi bi-truck"></i>
-                        </div>
-                        <h3 class="feature-title">Livraison rapide</h3>
-                        <p class="text-muted">Livraison à domicile en 24-48h</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <h3 class="feature-title">Paiement sécurisé</h3>
-                        <p class="text-muted">Transactions 100% sécurisées</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="bi bi-arrow-clockwise"></i>
-                        </div>
-                        <h3 class="feature-title">Retour gratuit</h3>
-                        <p class="text-muted">30 jours pour changer d'avis</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="bi bi-headset"></i>
-                        </div>
-                        <h3 class="feature-title">Support 24/7</h3>
-                        <p class="text-muted">Service client disponible</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dynamic Components Builder -->
-    @foreach($components as $component)
+    </div> -->
+    @php $components = $shop->components()->where('type', '!=', 'banner')->get(); @endphp
+       @foreach($components as $component)
         @include('shop.components.' . $component->type, [
             'id' => $component->id,
             'content' => $component->content,
@@ -473,39 +428,12 @@
         ])
     @endforeach
 
-    <!-- Category Navigation -->
-    @if($shop->categories()->where('is_active', true)->count() > 0)
-    <div class="container mb-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 d-flex align-items-center">
-                    <i class="bi bi-tags me-2 text-primary"></i>
-                    <span>Filtrer par catÃ©gorie</span>
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ route('shop.index', ['subdomain' => $shop->subdomain]) }}" 
-                       class="btn btn-sm {{ !$currentCategory ? 'btn-primary' : 'btn-outline-primary' }}">
-                        <i class="bi bi-grid me-1"></i> Tous les produits
-                    </a>
-                    @foreach($shop->categories()->where('is_active', true)->orderBy('order')->get() as $category)
-                        <a href="{{ route('shop.index', ['subdomain' => $shop->subdomain, 'category' => $category->slug]) }}" 
-                           class="btn btn-sm {{ ($currentCategory && $currentCategory->id === $category->id) ? 'btn-primary' : 'btn-outline-primary' }}">
-                            <i class="bi bi-tag me-1"></i> {{ $category->name }}
-                            @php
-                                $productCount = $category->products()->where('is_active', true)->count();
-                            @endphp
-                            @if($productCount > 0)
-                                <span class="badge bg-white text-primary ms-1">{{ $productCount }}</span>
-                            @endif
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
+ 
+
+    <!-- Dynamic Components Builder -->
+
+
+
 
     <!-- Products Section -->
     <div class="container" id="products">
@@ -599,6 +527,50 @@
                 @endforeach
             </div>
         @endif
+    </div>
+
+       <!-- Features Section -->
+    <div class="features-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <h3 class="feature-title">Livraison rapide</h3>
+                        <p class="text-muted">Livraison à domicile en 24-48h</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3 class="feature-title">Paiement sécurisé</h3>
+                        <p class="text-muted">Transactions 100% sécurisées</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </div>
+                        <h3 class="feature-title">Retour gratuit</h3>
+                        <p class="text-muted">30 jours pour changer d'avis</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <h3 class="feature-title">Support 24/7</h3>
+                        <p class="text-muted">Service client disponible</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Footer -->

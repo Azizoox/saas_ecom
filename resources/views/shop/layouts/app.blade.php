@@ -7,6 +7,8 @@
     <title>@yield('title', 'Ma Boutique')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="icon" href="{{ asset('images/img.jpg') }}" type="image/x-icon">
+
     <style>
         :root {
             --primary-color: #2563eb;
@@ -21,10 +23,32 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: var(--text-dark);
         }
+        /* Éliminer tout espace entre bannière et navbar */
+.banner-section {
+    display: block;
+    font-size: 0;
+    line-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+
+.banner-section > * {
+    font-size: initial;
+    line-height: normal;
+    margin-bottom: 0 !important;
+    padding-bottom: 10px !important;
+}
+
+/* Forcer la navbar collée */
+.navbar {
+    margin-top: 0 !important;
+}
 
         .navbar {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            
         }
         
         .search-result-item {
@@ -75,8 +99,22 @@
     @stack('styles')
 </head>
 <body>
+       @php $components = $shop->components()->where('type', 'banner')->get(); @endphp
+    <div class="banner-section">
+       
+             @foreach($components as $component)
+        @include('shop.components.' . $component->type, [
+            'id' => $component->id,
+            'content' => $component->content,
+            'shop' => $shop,
+            'categories' => $shop->categories()->where('is_active', true)->whereNull('parent_id')->get()
+        ])
+        @endforeach
+   
+      
+    </div>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top mb-0 pb-0">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ route('shop.index', ['subdomain' => $shop->subdomain ?? '']) }}">
                 @if($shop && $shop->logo)

@@ -140,7 +140,7 @@
         <h1 class="mb-4">Finaliser ma commande</h1>
         
         <!-- Checkout Steps -->
-        <div class="checkout-steps mb-5">
+        <!-- <div class="checkout-steps mb-5">
             <div class="step completed">
                 <div class="step-number">1</div>
                 <div class="step-label">Panier</div>
@@ -157,7 +157,7 @@
                 <div class="step-number">4</div>
                 <div class="step-label">Confirmation</div>
             </div>
-        </div>
+        </div> -->
         
         <div class="row">
             <div class="col-lg-8">

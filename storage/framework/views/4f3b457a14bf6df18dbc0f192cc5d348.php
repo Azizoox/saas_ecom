@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="<?php echo e(asset('images/img.jpg')); ?>" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -243,9 +244,10 @@
                 <!-- Logo -->
                 <div class="flex items-center space-x-3 animate-fadeInLeft">
                     <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center shadow-lg">
-                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
+                        </svg> -->
+                        <img src="<?php echo e(asset('images/img.jpg')); ?>" alt="">
                     </div>
                     <span class="text-2xl font-bold" style="color: var(--primary);">Shopino</span>
                 </div>
@@ -345,9 +347,9 @@
                 <!-- Right Content - Mockup -->
                 <div class="relative animate-fadeInRight delay-200">
                     <div class="relative z-10">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23fff' rx='20'/%3E%3Crect x='20' y='20' width='760' height='80' fill='%23f8fafc' rx='10'/%3E%3Ccircle cx='50' cy='60' r='15' fill='%233b9dd8'/%3E%3Crect x='80' y='50' width='100' height='20' fill='%23e2e8f0' rx='10'/%3E%3Crect x='650' y='50' width='130' height='20' fill='%23ff6b35' rx='10'/%3E%3Crect x='40' y='140' width='350' height='200' fill='%23f1f5f9' rx='10'/%3E%3Crect x='410' y='140' width='350' height='200' fill='%23f1f5f9' rx='10'/%3E%3Crect x='40' y='360' width='720' height='60' fill='%23f1f5f9' rx='10'/%3E%3Crect x='40' y='440' width='230' height='120' fill='%23dbeafe' rx='10'/%3E%3Crect x='285' y='440' width='230' height='120' fill='%23dbeafe' rx='10'/%3E%3Crect x='530' y='440' width='230' height='120' fill='%23dbeafe' rx='10'/%3E%3C/svg%3E" 
-                             alt="Shopino Dashboard" 
-                             class="w-full rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-500">
+                        <img src="<?php echo e(asset('images/hero.png')); ?>" 
+                             alt="Shopino Dashboard"  style="height: 350px;"
+                             class="w-full h-full  rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-500">
                     </div>
                     <!-- Floating cards -->
                     <div class="absolute -top-10 -left-10 glass p-4 rounded-xl shadow-xl animate-float">
@@ -363,14 +365,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="absolute -bottom-10 -right-10 glass p-4 rounded-xl shadow-xl animate-float" style="animation-delay: 1.5s;">
+                    <div class="absolute -bottom-10 -right-10 glass p-4 rounded-xl shadow-xl animate-float" style="animation-delay: 1.5s; margin-bottom: -30px;">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                                 </svg>
                             </div>
-                            <div class="text-white">
+                            <div class="text-white " >
                                 <div class="font-bold">4,850 DT</div>
                                 <div class="text-sm text-blue-100">Revenue</div>
                             </div>

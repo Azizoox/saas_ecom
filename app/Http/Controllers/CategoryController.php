@@ -14,7 +14,8 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::with('children', 'parent')->orderBy('order')->get();
+        $shop = Auth::user()->shops()->first();
+        $categories = Category::with('children', 'parent')->orderBy('order')->where('shop_id', $shop->id)->get();
         $rootCategories = Category::whereNull('parent_id')->orderBy('order')->get();
         
         return view('categories.index', compact('categories', 'rootCategories'));
