@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Shoopino - Plateforme E-commerce Multi-Tenant
 
 Plateforme e-commerce multi-tenant avec Laravel 12 permettant la création automatique de boutiques en ligne.
@@ -67,3 +68,7 @@ Et configurez votre serveur web (Apache/Nginx) pour accepter les sous-domaines w
 - `app/Http/Middleware/` - Middleware multi-tenant
 - `database/migrations/` - Migrations de base de données
 - `resources/views/` - Vues Blade
+=======
+# saas_ecom
+SaaS ecommerce is a software delivery model where a SaaS provider licenses their cloud-based ecommerce platform to businesses for a monthly subscription fee. Merchants can set up online stores using out-of-the-box features and templates, while the SaaS provider handles backend operations.
+>>>>>>> e98ca672eb12f97d9d559b60edf1cffd655a2979
