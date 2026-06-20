@@ -1,192 +1,45 @@
 <?php $__env->startSection('title', 'Commande - ' . ($shop->name ?? 'Ma Boutique')); ?>
 
 <?php $__env->startSection('content'); ?>
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #f59e0b;
-            --text-dark: #1f2937;
-            --text-light: #6b7280;
-            --border-color: #e5e7eb;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text-dark);
-            background-color: #f9fafb;
-        }
-
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .checkout-steps {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .checkout-steps::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--border-color);
-            z-index: 1;
-        }
-
-        .step {
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .step-number {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            border: 2px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 0.5rem;
-            font-weight: bold;
-        }
-
-        .step.active .step-number {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .step.completed .step-number {
-            background: var(--success-color, #10b981);
-            color: white;
-            border-color: var(--success-color, #10b981);
-        }
-
-        .step-label {
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-
-        .step.active .step-label,
-        .step.completed .step-label {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .checkout-form {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .summary-total {
-            display: flex;
-            justify-content: space-between;
-            padding: 1rem 0;
-            font-weight: bold;
-            font-size: 1.1rem;
-            border-top: 2px solid var(--border-color);
-        }
-
-        .payment-method {
-            border: 2px solid transparent;
-            border-radius: 10px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .payment-method.selected {
-            border-color: var(--primary-color);
-            background: rgba(var(--primary-color-rgb, 37, 99, 235), 0.05);
-        }
-
-        .payment-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--border-color);
-            border-radius: 8px;
-            margin-right: 1rem;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation -->
-   
-
+    
     <div class="container my-5">
         <h1 class="mb-4">Finaliser ma commande</h1>
-        
-        <!-- Checkout Steps -->
-        <!-- <div class="checkout-steps mb-5">
-            <div class="step completed">
-                <div class="step-number">1</div>
-                <div class="step-label">Panier</div>
-            </div>
-            <div class="step active">
-                <div class="step-number">2</div>
-                <div class="step-label">Commande</div>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <div class="step-label">Paiement</div>
-            </div>
-            <div class="step">
-                <div class="step-number">4</div>
-                <div class="step-label">Confirmation</div>
-            </div>
-        </div> -->
+        <p class="mb-4 text-muted">Connecté en tant que <?php echo e(auth()->user()->name ?? 'Invité'); ?></p>
+       
         
         <div class="row">
             <div class="col-lg-8">
                 <div class="checkout-form">
-                    <h4 class="mb-4">Informations de contact</h4>
-                    
-                    <form id="checkoutForm" action="<?php echo e(route('shop.process-order', ['subdomain' => $shop->subdomain ?? request()->route('subdomain', '')])); ?>" method="POST">
+                    <!-- Contact Information Section -->
+                    <div class="form-section mb-5">
+                        <h4 class="mb-4 pb-3 border-bottom"><i class="bi bi-person-circle me-2"></i>Informations de contact</h4>
+                        
+                        <form id="checkoutForm" action="<?php echo e(route('shop.confirm-checkout', ['subdomain' => $shop->subdomain ?? request()->route('subdomain', '')])); ?>" method="POST">
                         <?php echo csrf_field(); ?>
                         
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <label for="first_name" class="form-label">Prénom *</label>
-                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                <input type="text" class="form-control" id="first_name" name="first_name"  required value="<?php echo e(auth()->user()->first_name ?? ''); ?>">
+
                             </div>
                             <div class="col-md-6">
                                 <label for="last_name" class="form-label">Nom *</label>
-                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required value="<?php echo e(auth()->user()->last_name ?? ''); ?>">
                             </div>
                         </div>
                         
                         <div class="mb-4">
                             <label for="email" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" required value="<?php echo e(auth()->user()->email ?? ''); ?>">
                         </div>
                         
                         <div class="mb-4">
                             <label for="phone" class="form-label">Téléphone *</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                            <input type="tel" class="form-control" id="phone" name="phone" required value="<?php echo e(auth()->user()->phone ?? ''); ?>">
                         </div>
                         
-                        <h4 class="mb-4 mt-5">Adresse de livraison</h4>
+                        <h4 class="mb-4 mt-5 pb-3 border-bottom"><i class="bi bi-geo-alt me-2"></i>Adresse de livraison</h4>
                         
                         <div class="mb-4">
                             <label for="address" class="form-label">Adresse *</label>
@@ -246,7 +99,7 @@
                         </div>
                         
                         <div id="billing_address" class="d-none">
-                            <h4 class="mb-4">Adresse de facturation</h4>
+                            <h4 class="mb-4 pb-3 border-bottom"><i class="bi bi-credit-card me-2"></i>Adresse de facturation</h4>
                             
                             <div class="mb-4">
                                 <label for="billing_address" class="form-label">Adresse *</label>
@@ -273,49 +126,62 @@
                         
                         <input type="hidden" name="payment_method" id="selected_payment_method" value="card">
                         
-                        
-                        
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
-                            <i class="bi bi-lock me-2"></i>Procéder au paiement - <?php echo e(number_format($totalPrice, 2, ',', ' ')); ?> TND
-                        </button>
+                        <div class="mt-5 pt-4 border-top">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
+                                <i class="bi bi-arrow-right me-2"></i>Continuer vers la confirmation
+                            </button>
+                        </div>
                     </form>
+                    </div>
                 </div>
             </div>
             
             <div class="col-lg-4">
-                <div class="checkout-form">
-                    <h4 class="mb-4">Récapitulatif de la commande</h4>
+                <div class="checkout-form sticky-top" style="top: 20px;">
+                    <h4 class="mb-4 pb-3 border-bottom"><i class="bi bi-bag-check me-2"></i>Récapitulatif de la commande</h4>
                     
-                    <?php $__currentLoopData = $cartItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <div class="summary-item">
-                        <div>
-                            <strong><?php echo e($item->product->name); ?></strong>
-                            <br>
-                            <small class="text-muted"><?php echo e($item->quantity); ?> x <?php echo e(number_format($item->product->price, 2, ',', ' ')); ?> TND</small>
+                    <div class="products-section mb-4">
+                        <?php $__currentLoopData = $cartItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="summary-item p-3 mb-3 border rounded" style="background-color: #f8f9fa;">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-4">
+                                    <?php if($item->product->image): ?>
+                                        <img src="<?php echo e(asset('storage/' . $item->product->image)); ?>" alt="<?php echo e($item->product->name); ?>" class="img-fluid rounded" style="object-fit: cover; height: 80px; width: 100%;">
+                                    <?php else: ?>
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-8">
+                                    <strong class="d-block mb-1"><?php echo e($item->product->name); ?></strong>
+                                    <small class="text-muted d-block"><?php echo e($item->quantity); ?> x <?php echo e(number_format($item->product->price, 2, ',', ' ')); ?> TND</small>
+                                    <strong class="text-primary d-block mt-2"><?php echo e(number_format($item->product->price * $item->quantity, 2, ',', ' ')); ?> TND</strong>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-end">
-                            <?php echo e(number_format($item->product->price * $item->quantity, 2, ',', ' ')); ?> TND
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="pricing-section">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Sous-total</span>
+                            <strong><?php echo e(number_format($subtotal, 2, ',', ' ')); ?> TND</strong>
                         </div>
-                    </div>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    
-                    <div class="summary-item">
-                        <span>Sous-total</span>
-                        <span><?php echo e(number_format($subtotal, 2, ',', ' ')); ?> TND</span>
-                    </div>
-                    
-                    <div class="summary-item">
-                        <span>Frais de livraison</span>
-                        <span><?php echo e(number_format($shippingCost, 2, ',', ' ')); ?> TND</span>
-                    </div>
-                    
-                    <div class="summary-total">
-                        <span>Total</span>
-                        <span><?php echo e(number_format($totalPrice, 2, ',', ' ')); ?> TND</span>
+                        
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                            <span>Frais de livraison</span>
+                            <strong><?php echo e(number_format($shippingCost, 2, ',', ' ')); ?> TND</strong>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center" style="font-size: 1.25rem;">
+                            <span class="fw-bold">Total</span>
+                            <span class="fw-bold text-primary" style="font-size: 1.5rem;"><?php echo e(number_format($totalPrice, 2, ',', ' ')); ?> TND</span>
+                        </div>
                     </div>
                 </div>
-                
-                
             </div>
         </div>
     </div>

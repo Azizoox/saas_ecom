@@ -13,6 +13,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        // Load helper functions for subdomain routing
+        require_once app_path('Helpers/helpers.php');
     }
 }

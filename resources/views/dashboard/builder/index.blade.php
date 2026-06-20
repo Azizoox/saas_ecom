@@ -324,6 +324,9 @@
                                         @endswitch
                                     </span>
                                     <div class="block-actions">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-toggle-content" title="Afficher / masquer le formulaire" aria-label="Afficher ou masquer le formulaire">
+                                            <i class="bi bi-chevron-down"></i>
+                                        </button>
                                         <form action="{{ route('builder.destroy', $component) }}" method="POST" class="d-inline delete-component-form">
                                             @csrf
                                             @method('DELETE')
@@ -333,6 +336,7 @@
                                         </form>
                                     </div>
                                 </div>
+                                
                                 <div class="block-form-wrap">
                                     <form action="{{ route('builder.update', $component) }}" method="POST" enctype="multipart/form-data">
                                         @csrf
@@ -448,6 +452,23 @@
         });
         deleteModal.addEventListener('hidden.bs.modal', function() { formToSubmit = null; });
     }
+
+    // Toggle collapse for block form content
+    document.querySelectorAll('.btn-toggle-content').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const block = btn.closest('.component-block');
+            if (!block) return;
+            const formWrap = block.querySelector('.block-form-wrap');
+            if (!formWrap) return;
+            const expanded = !formWrap.classList.contains('d-none');
+            formWrap.classList.toggle('d-none', expanded);
+            const icon = btn.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('bi-chevron-down', expanded);
+                icon.classList.toggle('bi-chevron-up', !expanded);
+            }
+        });
+    });
 
     const modal = document.getElementById('addComponentModal');
     const componentData = {

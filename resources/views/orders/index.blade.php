@@ -3,106 +3,189 @@
 @section('title', 'Commandes')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-cart-check"></i> Toutes les commandes</h2>
-    <a href="{{ route('orders.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Nouvelle commande
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+        <h1 class="text-2xl md:text-2xl font-bold text-gray-900 flex items-center gap-3">
+            <i class="bi bi-cart-check text-blue-600"></i>
+            <span>Toutes les commandes</span>
+        </h1>
+        <p class="text-gray-500 mt-1">Gérez et suivez vos commandes en temps réel</p>
+    </div>
+    <a href="{{ route('orders.create') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <i class="bi bi-plus-lg"></i>
+        <span>Nouvelle commande</span>
     </a>
 </div>
 
-<div class="card mb-3">
-    <div class="card-body">
-        <form method="GET" action="{{ route('orders.index') }}" class="row g-2 align-items-end">
-            <div class="col-md-2">
-                <label class="form-label">Statut</label>
-                <select name="status" class="form-select">
-                    <option value="">Tous</option>
-                    @foreach($statuses as $status)
-                        <option value="{{ $status }}" @selected(($filters['status'] ?? '') === $status)>{{ ucfirst($status) }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Date (de)</label>
-                <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="form-control">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Date (à)</label>
-                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="form-control">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Client</label>
-                <input type="text" name="client" value="{{ $filters['client'] ?? '' }}" class="form-control" placeholder="Nom, email, téléphone">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">N° commande</label>
-                <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" class="form-control" placeholder="ORD-...">
-            </div>
-            <div class="col-md-1 d-grid">
-                <button class="btn btn-outline-primary" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
-            </div>
-        </form>
-    </div>
+<!-- Filter Card -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 p-6">
+    <form method="GET" action="{{ route('orders.index') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+        <!-- Status Filter -->
+        <div class="col-span-1">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Statut</label>
+            <select name="status" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-gray-900 font-medium">
+                <option value="">Tous les statuts</option>
+                @foreach($statuses as $status)
+                    <option value="{{ $status }}" @selected(($filters['status'] ?? '') === $status)>{{ ucfirst($status) }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- Date From -->
+        <div class="col-span-1">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Du</label>
+            <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-gray-900">
+        </div>
+
+        <!-- Date To -->
+        <div class="col-span-1">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Au</label>
+            <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-gray-900">
+        </div>
+
+        <!-- Client -->
+        <div class="col-span-1 md:col-span-2 lg:col-span-1">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Client</label>
+            <input type="text" name="client" value="{{ $filters['client'] ?? '' }}" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-gray-900" placeholder="Nom ou email">
+        </div>
+
+        <!-- Order Number -->
+        <div class="col-span-1">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Commande N°</label>
+            <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white text-gray-900" placeholder="ORD-...">
+        </div>
+
+        <!-- Search Button -->
+        <div class="col-span-1 flex gap-2">
+            <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5">
+                <i class="bi bi-search"></i>
+                <span class="hidden sm:inline">Chercher</span>
+            </button>
+        </div>
+    </form>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        @if($orders->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>N°</th>
-                            <th>Boutique</th>
-                            <th>Client</th>
-                            <th>Statut</th>
-                            <th>Total</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($orders as $order)
-                            <tr>
-                                <td><strong>{{ $order->order_number }}</strong></td>
-                                <td>{{ $order->shop->name ?? '—' }}</td>
-                                <td>
-                                    {{ $order->customer_name ?? '—' }}
-                                    @if($order->customer_phone)
-                                        <br><small class="text-muted">{{ $order->customer_phone }}</small>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary">{{ ucfirst($order->status) }}</span>
-                                </td>
-                                <td>{{ number_format($order->total ?? 0, 2, ',', ' ') }} TND</td>
-                                <td>{{ $order->created_at?->format('d/m/Y H:i') }}</td>
-                                <td>
-                                    <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+<!-- Orders Table -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    @if($orders->count() > 0)
+        <!-- Table Container -->
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <!-- Table Header -->
+                <thead>
+                    <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">N° Commande</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Boutique</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Client</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Total</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
 
-            <div class="mt-3">
-                {{ $orders->links() }}
+                <!-- Table Body -->
+                <tbody class="divide-y divide-gray-200">
+                    @foreach($orders as $order)
+                        <tr class="hover:bg-blue-50 transition-colors duration-150 group">
+                            <!-- Order Number -->
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg font-bold text-sm">
+                                    <i class="bi bi-bookmark-fill"></i>
+                                    {{ $order->order_number }}
+                                </span>
+                            </td>
+
+                            <!-- Shop Name -->
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full"></div>
+                                    <span class="text-sm font-medium text-gray-900">{{ $order->shop->name ?? '—' }}</span>
+                                </div>
+                            </td>
+
+                            <!-- Customer Info -->
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold text-gray-900">{{ $order->customer_name ?? '—' }}</span>
+                                    @if($order->customer_phone)
+                                        <span class="text-xs text-gray-500 mt-0.5">
+                                            <i class="bi bi-telephone me-1"></i>{{ $order->customer_phone }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </td>
+
+                            <!-- Status Badge -->
+                            <td class="px-6 py-4">
+                                @php
+                                    $statusColor = match($order->status) {
+                                        'pending' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                                        'processing' => 'bg-blue-100 text-blue-800 border-blue-300',
+                                        'completed' => 'bg-green-100 text-green-800 border-green-300',
+                                        'cancelled' => 'bg-red-100 text-red-800 border-red-300',
+                                        'shipped' => 'bg-purple-100 text-purple-800 border-purple-300',
+                                        default => 'bg-gray-100 text-gray-800 border-gray-300'
+                                    };
+                                    $statusIcon = match($order->status) {
+                                        'pending' => 'bi-hourglass-split',
+                                        'processing' => 'bi-arrow-repeat',
+                                        'completed' => 'bi-check-circle',
+                                        'cancelled' => 'bi-x-circle',
+                                        'shipped' => 'bi-box-seam',
+                                        default => 'bi-question-circle'
+                                    };
+                                @endphp
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border {{ $statusColor }}">
+                                    <i class="bi {{ $statusIcon }}"></i>
+                                    {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                                </span>
+                            </td>
+
+                            <!-- Total Price -->
+                            <td class="px-6 py-4 text-right">
+                                <span class="text-sm font-bold text-gray-900">{{ number_format($order->total ?? 0, 2, ',', ' ') }} <span class="text-xs text-gray-500">TND</span></span>
+                            </td>
+
+                            <!-- Date -->
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-medium text-gray-900">{{ $order->created_at?->format('d/m/Y') }}</span>
+                                    <span class="text-xs text-gray-500">{{ $order->created_at?->format('H:i') }}</span>
+                                </div>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 text-center">
+                                <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-700 transition-all duration-200 transform hover:scale-110 group-hover:shadow-md">
+                                    <i class="bi bi-eye-fill text-sm"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="bg-gray-50 border-t border-gray-200 px-6 py-4">
+            {{ $orders->links() }}
+        </div>
+    @else
+        <!-- Empty State -->
+        <div class="flex flex-col items-center justify-center py-12 px-6">
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-50 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                <i class="bi bi-inbox text-4xl text-blue-400"></i>
             </div>
-        @else
-            <div class="text-center py-5">
-                <i class="bi bi-cart-check" style="font-size: 3rem; color: #ccc;"></i>
-                <p class="text-muted mt-3">Aucune commande pour le moment.</p>
-                <a href="{{ route('orders.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Créer une commande
-                </a>
-            </div>
-        @endif
-    </div>
+            <h3 class="text-2xl font-bold text-gray-900 mt-4 mb-2">Aucune commande</h3>
+            <p class="text-gray-500 text-center max-w-sm mb-6">Il semble que vous n'ayez pas encore de commandes. Commencez par créer votre première commande.</p>
+            <a href="{{ route('orders.create') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <i class="bi bi-plus-lg"></i>
+                <span>Créer une commande</span>
+            </a>
+        </div>
+    @endif
 </div>
 @endsection
 

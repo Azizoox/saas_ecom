@@ -16,7 +16,7 @@ class SuperAdminSeeder extends Seeder
     public function run(): void
     {
         $email = env('SUPER_ADMIN_EMAIL', 'superadmin@shoopino.com');
-        $password = env('SUPER_ADMIN_PASSWORD', 'SuperAdmin123!');
+        $password = env('SUPER_ADMIN_PASSWORD', 'Admin123!');
 
         if (User::where('email', $email)->exists()) {
             $this->command->info("Super Admin déjà existant: {$email}");
@@ -31,6 +31,8 @@ class SuperAdminSeeder extends Seeder
             'password' => Hash::make($password),
             'role' => 'super_admin',
         ]);
+        
+
 
         $this->command->info("Super Admin créé: {$email}");
         $this->command->warn('En production, définissez SUPER_ADMIN_EMAIL et SUPER_ADMIN_PASSWORD dans .env et changez le mot de passe après la première connexion.');

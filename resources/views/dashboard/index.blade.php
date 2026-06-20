@@ -111,47 +111,7 @@
     </div>
 </div>
 
-<!-- Quick Actions -->
-<!-- <div class="row mb-4">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 d-flex align-items-center">
-                    <i class="bi bi-lightning-fill text-primary me-2"></i>
-                    Actions rapides
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-3 col-6">
-                        <a href="{{ route('products.create') }}" class="btn btn-outline-primary w-100 py-3">
-                            <i class="bi bi-plus-circle d-block mb-2" style="font-size: 1.5rem;"></i>
-                            <span>Ajouter un produit</span>
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <a href="{{ route('categories.create') }}" class="btn btn-outline-success w-100 py-3">
-                            <i class="bi bi-tags d-block mb-2" style="font-size: 1.5rem;"></i>
-                            <span>Nouvelle catégorie</span>
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <a href="{{ route('builder.index') }}" class="btn btn-outline-info w-100 py-3">
-                            <i class="bi bi-layout-text-sidebar-reverse d-block mb-2" style="font-size: 1.5rem;"></i>
-                            <span>Builder page</span>
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <a href="{{ route('settings.index') }}" class="btn btn-outline-secondary w-100 py-3">
-                            <i class="bi bi-gear d-block mb-2" style="font-size: 1.5rem;"></i>
-                            <span>Paramètres</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
+
 
 <!-- Shops Table -->
 <div class="row">
@@ -163,9 +123,7 @@
                         <i class="bi bi-shop-window me-2 text-primary"></i>
                         Mes boutiques
                     </h5>
-                    <a href="#" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus"></i> Nouvelle boutique
-                    </a>
+                    
                 </div>
             </div>
             <div class="card-body">

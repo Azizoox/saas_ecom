@@ -182,6 +182,73 @@
             border-radius: 2rem;
             font-weight: 500;
             font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        
+        .user-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* User Profile Dropdown */
+        .user-profile-dropdown {
+            position: relative;
+        }
+        
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            margin-top: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1050;
+        }
+        
+        .user-profile-dropdown:hover .user-dropdown-menu,
+        .user-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .user-dropdown-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .user-dropdown-menu .dropdown-item:hover {
+            background-color: #f5f5f5;
+            color: var(--primary-color);
+            padding-left: 1.25rem;
+        }
+        
+        .user-dropdown-menu .dropdown-divider {
+            margin: 0.5rem 0;
+            opacity: 0.3;
+        }
+           .agent-badge {
+            background: #1e293b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            font-size: 0.875rem;
         }
         
         /* Responsive */
@@ -365,15 +432,7 @@
                         </a>
                     </li>
                     
-                    <li class="nav-item mt-4 pt-3 border-top border-gray-700">
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="nav-link btn btn-link text-white w-100 text-start">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span class="nav-text">Déconnexion</span>
-                            </button>
-                        </form>
-                    </li>
+                   
                     @endif
                 </ul>
             </div>
@@ -395,18 +454,46 @@
                     </div>
                     
                     <div class="d-flex align-items-center gap-3">
-                        <div class="position-relative">
+                        <!-- <div class="position-relative">
                             <button class="btn btn-light rounded-circle position-relative" style="width: 40px; height: 40px;">
                                 <i class="bi bi-bell"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                     3
                                 </span>
                             </button>
+                        </div> -->
+                        <div class="user-profile-dropdown">
+                            <div class="user-badge" id="userBadge">
+                                <i class="bi bi-person-circle me-2"></i>
+                                {{ auth()->user()->email }}
+                                <i class="bi bi-chevron-down ms-2" style="font-size: 0.8rem;"></i>
+                            </div>
+                            <div class="user-dropdown-menu" id="userDropdownMenu">
+                                <a href="{{ route('profile.edit') }}" class="dropdown-item">
+                                    <i class="bi bi-person me-2"></i>Mon Profil
+                                </a>
+                                <a href="{{ route('settings.index') }}" class="dropdown-item">
+                                    <i class="bi bi-gear me-2"></i>Paramètres
+                                </a>
+                                <hr class="dropdown-divider">
+                                <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item w-100 text-start border-0 bg-transparent">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <div class="user-badge">
-                            <i class="bi bi-person-circle me-2"></i>
-                            {{ auth()->user()->email }}
+                        <div class="agent-badge d-none">
+                                <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="nav-link btn btn-link text-white w-100 text-start">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span class="nav-text">Déconnexion</span>
+                            </button>
+                        </form>
                         </div>
+                     
                     </div>
                 </div>
             </div>
@@ -445,6 +532,8 @@
             const desktopToggle = document.getElementById('desktop-toggle');
             const mobileToggle = document.getElementById('mobile-toggle');
             const overlay = document.getElementById('overlay');
+            const userBadge = document.getElementById('userBadge');
+            const userDropdownMenu = document.getElementById('userDropdownMenu');
             
             // Desktop sidebar toggle
             if (desktopToggle) {
@@ -501,6 +590,26 @@
                     sidebar.classList.remove('active');
                     overlay.classList.remove('active');
                     document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // User Profile Dropdown Toggle
+            if (userBadge) {
+                userBadge.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (userDropdownMenu) {
+                        userDropdownMenu.classList.toggle('show');
+                    }
+                });
+            }
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                const isClickInsideDropdown = userDropdownMenu && userDropdownMenu.contains(event.target);
+                const isClickInsideBadge = userBadge && userBadge.contains(event.target);
+                
+                if (!isClickInsideDropdown && !isClickInsideBadge && userDropdownMenu) {
+                    userDropdownMenu.classList.remove('show');
                 }
             });
             

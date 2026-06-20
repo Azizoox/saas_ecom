@@ -1,0 +1,1 @@
+<?php /**PATH C:\Users\ahach\OneDrive\Bureau\shoopino\resources\views/shop/components/navbar.blade.php ENDPATH**/ ?>

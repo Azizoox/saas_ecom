@@ -27,12 +27,15 @@ class SettingsController extends Controller
         
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'keywords' => 'nullable|string',
+            'keywords' => 'nullable|string|max:500',
             'description' => 'nullable|string|max:1000',
-            'subdomain' => ['required', 'string', 'max:255', Rule::unique('shops')->ignore($shop->id)],
-            'custom_domain' => ['nullable', 'string', 'max:255', Rule::unique('shops')->ignore($shop->id)],
-            'logo' => 'nullable|image|max:2048',
-            'favicon' => 'nullable|image|max:512',
+            'subdomain' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_-]+$/', Rule::unique('shops')->ignore($shop->id)],
+            'custom_domain' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9._-]+$/', Rule::unique('shops')->ignore($shop->id)],
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif,ico|max:512',
+        ], [
+            'subdomain.regex' => 'Le sous-domaine ne peut contenir que des lettres, des chiffres, des tirets et des underscores.',
+            'custom_domain.regex' => 'Le domaine personnalisé ne peut contenir que des lettres, des chiffres, des points, des tirets et des underscores.',
         ]);
 
         if ($request->hasFile('logo')) {
@@ -60,9 +63,11 @@ class SettingsController extends Controller
         
         $validated = $request->validate([
             'company_name' => 'nullable|string|max:255',
-            'tax_id' => 'nullable|string|max:255',
+            'tax_id' => 'nullable|string|max:50',
             'contact_email' => 'nullable|email|max:255',
-            'contact_phone' => 'nullable|string|max:255',
+            'contact_phone' => 'nullable|string|max:30|regex:/^[+]?[0-9\s-]+$/',
+        ], [
+            'contact_phone.regex' => 'Le numéro de téléphone doit contenir uniquement des chiffres, des espaces, des tirets ou un signe +.',
         ]);
 
         $shop->update($validated);
@@ -95,12 +100,15 @@ class SettingsController extends Controller
         
         $validated = $request->validate([
             'language' => 'required|string|in:fr,ar,en',
-            'currency' => 'required|string|max:10',
+            'currency' => 'required|string|max:10|regex:/^[A-Z]{3}$/',
             'timezone' => 'required|string|max:255',
             'theme' => 'required|string|max:255',
-            'primary_color' => 'required|string|max:7',
+            'primary_color' => 'required|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
             'display_mode' => 'required|in:light,dark,auto',
             'date_format' => 'required|string|max:50',
+        ], [
+            'currency.regex' => 'Le code devise doit être composé de exactement 3 lettres majuscules (ex: TND, USD, EUR).',
+            'primary_color.regex' => 'La couleur doit être au format hexadécimal (ex: #3490dc).',
         ]);
 
         $settings->update($validated);
@@ -115,12 +123,19 @@ class SettingsController extends Controller
         
         $validated = $request->validate([
             'bank_name' => 'nullable|string|max:255',
-            'bank_account' => 'nullable|string|max:255',
+            'bank_account' => 'nullable|string|max:50|regex:/^[A-Z0-9\s-]+$/',
             'account_holder' => 'nullable|string|max:255',
             'payment_cod' => 'boolean',
             'payment_bank_transfer' => 'boolean',
             'payment_card' => 'boolean',
+        ], [
+            'bank_account.regex' => 'Le RIB/IBAN ne peut contenir que des lettres majuscules, des chiffres, des espaces et des tirets.',
         ]);
+
+        // Convert checkbox values to boolean
+        $validated['payment_cod'] = $request->has('payment_cod');
+        $validated['payment_bank_transfer'] = $request->has('payment_bank_transfer');
+        $validated['payment_card'] = $request->has('payment_card');
 
         $settings->update($validated);
 
@@ -136,9 +151,11 @@ class SettingsController extends Controller
             'facebook_url' => 'nullable|url|max:255',
             'instagram_url' => 'nullable|url|max:255',
             'tiktok_url' => 'nullable|url|max:255',
-            'whatsapp_number' => 'nullable|string|max:255',
+            'whatsapp_number' => 'nullable|string|max:30|regex:/^[+]?[0-9\s-]+$/',
             'twitter_url' => 'nullable|url|max:255',
             'youtube_url' => 'nullable|url|max:255',
+        ], [
+            'whatsapp_number.regex' => 'Le numéro WhatsApp doit contenir uniquement des chiffres, des espaces, des tirets ou un signe +.',
         ]);
 
         $settings->update($validated);

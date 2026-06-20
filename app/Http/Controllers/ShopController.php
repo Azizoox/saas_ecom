@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Models\Shop;
-use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Shop;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 
 class ShopController extends Controller
 {
@@ -36,6 +38,8 @@ class ShopController extends Controller
 
         $products = $productsQuery->get();
         $components = $shop->components()->where('is_active', true)->orderBy('order')->get();
+        $displayMode = $shop->settings?->display_mode ?? 'light';
+        
 
         // If there's a category filter, use the category products view
         if ($currentCategory) {
@@ -43,6 +47,7 @@ class ShopController extends Controller
                 'shop' => $shop,
                 'products' => $products,
                 'currentCategory' => $currentCategory,
+                'displayMode' => $displayMode,
             ]);
         }
         
@@ -52,10 +57,11 @@ class ShopController extends Controller
             'products' => $products,
             'components' => $components,
             'currentCategory' => $currentCategory,
+            'displayMode' => $displayMode,
         ]);
     }
 
-    // public function page(string $slug): View
+  
     // {
     //     $shop = app('shop');
         
@@ -124,11 +130,13 @@ class ShopController extends Controller
             ->where('id', '!=', $product->id)
             ->limit(4)
             ->get();
+        $displayMode = $shop->settings?->display_mode ?? 'light';
 
         return view('shop.product-show', [
             'shop' => $shop,
             'product' => $product,
             'relatedProducts' => $relatedProducts,
+            'displayMode' => $displayMode,
         ]);
     }
     
@@ -153,6 +161,7 @@ class ShopController extends Controller
         
         $shippingCost = 0; // Free shipping for now
         $totalPrice = $subtotal + $shippingCost;
+        $displayMode = $shop->settings?->display_mode ?? 'light';
         
         return view('shop.checkout', [
             'shop' => $shop,
@@ -160,17 +169,139 @@ class ShopController extends Controller
             'subtotal' => $subtotal,
             'shippingCost' => $shippingCost,
             'totalPrice' => $totalPrice,
+            'displayMode' => $displayMode,
         ]);
     }
-    
-    public function processOrder(Request $request)
+     public function editProfile(): View
     {
         $shop = app('shop');
-        
+
         if (!$shop) {
             abort(404);
         }
         
+        $user = Auth::user();
+        
+        // Afficher le profil pour les customers uniquement
+        if ($user && $user->role === 'customer') {
+            return view('shop.profile', [
+                'user' => $user,
+                'shop' => $shop
+            ]);
+        }
+
+        // Les non-customers ne peuvent pas modifier leur profil depuis le shop
+        abort(403, 'Accès non autorisé.');
+    }
+       public function updateProfile(Request $request): RedirectResponse
+    {
+        $user = auth()->user();
+        $shop = app('shop');
+
+        if (!$shop) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'email.unique' => 'Cet email est déjà utilisé.',
+        ]);
+
+        // Gérer l'upload de l'avatar
+        if ($request->hasFile('avatar')) {
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user->update($validated);
+
+        // Redirection selon le rôle de l'utilisateur
+        if ($user->role === 'customer') {
+            return redirect()->route('shop.profile', ['subdomain' => $shop->subdomain])
+            ->with('success', 'Vos informations ont été mises à jour avec succès.');
+        }
+
+       
+    }
+
+    public function confirmCheckout(Request $request)
+    {
+        $shop = app('shop');
+
+        if (!$shop) {
+            abort(404);
+        }
+
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'city' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:20',
+            'country' => 'required|string|max:255',
+            'payment_method' => 'required|in:card,paypal',
+        ]);
+
+        $cartItems = \App\Models\Cart::getCartItems(Auth::id());
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->back()->withErrors(['error' => 'Votre panier est vide.']);
+        }
+
+        // Calculate totals
+        $subtotal = 0;
+        foreach ($cartItems as $item) {
+            $subtotal += $item->product->price * $item->quantity;
+        }
+
+        $shippingCost = 0; // Free shipping for now
+        $totalPrice = $subtotal + $shippingCost;
+        $discountTotal = 0;
+
+        // Store customer data in session for the confirmation page
+        $customerData = [
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'city' => $request->city,
+            'postal_code' => $request->postal_code,
+            'country' => $request->country,
+        ];
+
+        session(['checkout_data' => $customerData]);
+        session(['payment_method' => $request->payment_method]);
+        $displayMode = $shop->settings?->display_mode ?? 'light';
+
+        return view('shop.confirm-checkout', [
+            'shop' => $shop,
+            'cartItems' => $cartItems,
+            'subtotal' => $subtotal,
+            'shippingCost' => $shippingCost,
+            'totalPrice' => $totalPrice,
+            'discountTotal' => $discountTotal,
+            'customerData' => $customerData,
+            'paymentMethod' => $request->payment_method,
+            'displayMode' => $displayMode,
+        ]);
+    }
+
+    public function processOrder(Request $request)
+    {
+        $shop = app('shop');
+
+        if (!$shop) {
+            abort(404);
+        }
+
+        // Validate form data
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -269,11 +400,13 @@ class ShopController extends Controller
         
         // Load products if this page should display them
         $products = $shop->products()->where('is_active', true)->get();
+        $displayMode = $shop->settings?->display_mode ?? 'light';
         
         return view('shop.page', [
             'shop' => $shop,
             'page' => $page,
             'products' => $products,
+            'displayMode' => $displayMode,
         ]);
     }
     
@@ -317,12 +450,14 @@ class ShopController extends Controller
         }
         
         $components = $shop->components()->where('is_active', true)->orderBy('order')->get();
+        $displayMode = $shop->settings?->display_mode ?? 'light';
         
         return view('shop.search-results', [
             'shop' => $shop,
             'products' => $results,
             'query' => $query,
             'components' => $components,
+            'displayMode' => $displayMode,
         ]);
     }
 }

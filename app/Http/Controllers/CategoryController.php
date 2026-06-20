@@ -14,17 +14,39 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $shop = Auth::user()->shops()->first();
-        $categories = Category::with('children', 'parent')->orderBy('order')->where('shop_id', $shop->id)->get();
-        $rootCategories = Category::whereNull('parent_id')->orderBy('order')->get();
-        
-        return view('categories.index', compact('categories', 'rootCategories'));
+        $user = Auth::user();
+        $shop = $user->shops()->first();
+
+        // make sure we have a shop before querying
+        if (!$shop) {
+            // no shops for this user, show empty list
+            $categories = collect();
+            $rootCategories = collect();
+        } else {
+            $categories = Category::with('children', 'parent')
+                ->where('shop_id', $shop->id)
+                ->orderBy('order')
+                ->get();
+
+            $rootCategories = Category::where('shop_id', $shop->id)
+                ->whereNull('parent_id')
+                ->orderBy('order')
+                ->get();
+        }
+
+        // all shops belonging to user for the create form (modal/select)
+        $shops = $user->shops;
+
+        return view('categories.index', compact('categories', 'rootCategories', 'shops'));
     }
 
     public function create()
     {
         $shops = Auth::user()->shops;
-        $categories = Category::orderBy('name')->get();
+        // only categories belonging to one of the user's shops
+        $categories = Category::whereIn('shop_id', $shops->pluck('id'))
+            ->orderBy('name')
+            ->get();
         
         return view('categories.create', compact('shops', 'categories'));
     }
@@ -34,7 +56,7 @@ class CategoryController extends Controller
     try {
         // Validation des données
         $validated = $request->validate([
-            'shop_id' => 'nullable|exists:shops,id',
+            'shop_id' => 'required|exists:shops,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'parent_id' => 'nullable|exists:categories,id',
@@ -43,6 +65,7 @@ class CategoryController extends Controller
             'order' => 'nullable|integer|min:0',
             'is_active' => 'boolean'
         ], [
+            'shop_id.required' => 'La boutique est obligatoire.',
             'shop_id.exists' => 'La boutique sélectionnée n\'existe pas.',
             'name.required' => 'Le nom de la catégorie est obligatoire.',
             'name.max' => 'Le nom ne peut pas dépasser 255 caractères.',
@@ -171,21 +194,25 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         $shops = Auth::user()->shops;
-        $categories = Category::where('id', '!=', $category->id)->orderBy('name')->get();
+        // only categories that belong to one of the user's shops (excluding current)
+        $categories = Category::whereIn('shop_id', $shops->pluck('id'))
+            ->where('id', '!=', $category->id)
+            ->orderBy('name')
+            ->get();
         
         return view('categories.edit', compact('category', 'shops', 'categories'));
     }
 
     public function update(Request $request, Category $category)
     {
-        $request->validate([
+        $validated = $request->validate([
             'shop_id' => 'required|exists:shops,id',
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'parent_id' => 'nullable|exists:categories,id|required_with:parent_id',
+            'description' => 'nullable|string|max:1000',
+            'parent_id' => 'nullable|exists:categories,id',
             'icon' => 'nullable|file|mimes:jpg,jpeg,png,svg,gif|max:2048',
-            'image' => 'nullable|file|mimes:jpg,jpeg,png,svg,gif|max:5120',
-            'order' => 'nullable|integer',
+            'image' => 'nullable|file|mimes:jpg,jpeg,png,svg,gif,webp|max:5120',
+            'order' => 'nullable|integer|min:0',
             'is_active' => 'boolean'
         ]);
         
@@ -195,7 +222,25 @@ class CategoryController extends Controller
             abort(403, 'Vous n\'avez pas le droit de modifier cette catégorie.');
         }
         
-        $data = $request->except(['icon', 'image']);
+        // Prepare data from validated input only
+        $data = [
+            'shop_id' => $validated['shop_id'],
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'parent_id' => $validated['parent_id'] ?? null,
+            'order' => $validated['order'] ?? 0,
+            'is_active' => $request->boolean('is_active', false),
+        ];
+        
+        // Additional check: if parent_id provided ensure it belongs to same shop
+        if (!empty($data['parent_id'])) {
+            $parent = Category::find($data['parent_id']);
+            if ($parent && $parent->shop_id !== $category->shop_id) {
+                return redirect()->back()
+                    ->withErrors(['parent_id' => 'La catégorie parente doit appartenir à la même boutique.'])
+                    ->withInput();
+            }
+        }
         
         // Handle file uploads
         if ($request->hasFile('icon')) {
@@ -203,7 +248,9 @@ class CategoryController extends Controller
             if ($category->icon) {
                 Storage::disk('public')->delete($category->icon);
             }
-            $data['icon'] = $request->file('icon')->store('categories/icons', 'public');
+            $iconFile = $request->file('icon');
+            $iconName = time() . '_icon_' . Str::slug($validated['name']) . '.' . $iconFile->getClientOriginalExtension();
+            $data['icon'] = $iconFile->storeAs('categories/icons', $iconName, 'public');
         }
         
         if ($request->hasFile('image')) {
@@ -211,12 +258,14 @@ class CategoryController extends Controller
             if ($category->image) {
                 Storage::disk('public')->delete($category->image);
             }
-            $data['image'] = $request->file('image')->store('categories/images', 'public');
+            $imageFile = $request->file('image');
+            $imageName = time() . '_image_' . Str::slug($validated['name']) . '.' . $imageFile->getClientOriginalExtension();
+            $data['image'] = $imageFile->storeAs('categories/images', $imageName, 'public');
         }
         
-        $data['is_active'] = $request->has('is_active') ? true : false;
-        
+        // Update category and ensure updated_at timestamp is refreshed
         $category->update($data);
+        $category->touch();
         
         return redirect()->route('categories.index')->with('success', 'Catégorie mise à jour avec succès!');
     }

@@ -10,6 +10,8 @@ class Category extends Model
 {
     use HasFactory;
 
+    public $timestamps = true;
+
     protected $fillable = [
         'shop_id',
         'name',
@@ -39,7 +41,8 @@ class Category extends Model
         });
 
         static::updating(function ($category) {
-            if ($category->isDirty('name') && empty($category->slug)) {
+            // Regenerate slug if name has changed
+            if ($category->isDirty('name')) {
                 $category->slug = Str::slug($category->name);
             }
         });

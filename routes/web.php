@@ -2,29 +2,44 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LogisticsController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\POSController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesStatsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShopComponentController;
 use App\Http\Controllers\ShopController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\POSController;
 use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\Auth\VerificationController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Test route
+Route::post('/chat', [ChatController::class, 'store'])
+    ->middleware(['throttle:30,1']);
+
+Route::get('/chat-test', function() {
+    return view('chat-test');
+});
 Route::get('/test-db', function() {
     try {
         $shops = \App\Models\Shop::all();
         $products = \App\Models\Product::all();
+        $conversations = \App\Models\Conversation::all();
+        $messages = \App\Models\Message::all();
+        
         return response()->json([
             'shops_count' => $shops->count(),
             'products_count' => $products->count(),
+            'conversations_count' => $conversations->count(),
+            'messages_count' => $messages->count(),
             'shops' => $shops->take(5)->map(fn($s) => ['id' => $s->id, 'subdomain' => $s->subdomain]),
             'products' => $products->take(5)->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'shop_id' => $p->shop_id])
         ]);
@@ -32,6 +47,8 @@ Route::get('/test-db', function() {
         return response()->json(['error' => $e->getMessage()], 500);
     }
 });
+Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
 // Route d'accueil - redirige vers login
 Route::get('/', function () {
@@ -45,6 +62,19 @@ Route::middleware('guest')->group(function () {
     
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store']);
+});
+
+// Routes de confirmation email
+Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
+    ->middleware('signed')
+    ->name('verification.verify');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', [VerificationController::class, 'notice'])
+        ->name('verification.notice');
+
+    Route::post('/email/verification-notification', [VerificationController::class, 'resend'])
+        ->name('verification.send');
 });
 
 // Debug routes
@@ -82,13 +112,28 @@ Route::get('/debug-shop/{subdomain}', function($subdomain) {
 
 // Routes Super Admin (email + password, accès dashboard stats globales)
 Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('super-admin.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [SuperAdminController::class, 'index'])->name('dashboard');
+    
+    // Gestion des utilisateurs
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [SuperAdminController::class, 'listUsers'])->name('index');
+        Route::get('/{user}', [SuperAdminController::class, 'showUser'])->name('show');
+        Route::delete('/{user}', [SuperAdminController::class, 'deleteUser'])->name('destroy');
+    });
 });
 
 // Routes authentifiées (dashboard)
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+    
+    // Routes de profil utilisateur
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/edit', [SuperAdminController::class, 'editProfile'])->name('edit');
+        Route::put('/update', [SuperAdminController::class, 'updateProfile'])->name('update');
+    });
+    
     
     // POS Routes
     Route::prefix('pos')->group(function () {
@@ -105,12 +150,7 @@ Route::middleware('auth')->group(function () {
     // Routes pour les produits
     Route::resource('products', ProductController::class);
     
-    // Route de test pour le formulaire
-    // Route::get('/test-product-form', function() {
-    //     $user = auth()->user();
-    //     $shops = $user->shops;
-    //     return view('products.create_advanced', ['shops' => $shops]);
-    // })->name('test.product.form');
+  
 
     // Routes pour les commandes
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
@@ -183,14 +223,48 @@ Route::prefix('shop/{subdomain}')->middleware([\App\Http\Middleware\HandleTenanc
     
     // Routes pour la commande
     Route::get('/checkout', [ShopController::class, 'checkout'])->name('shop.checkout');
+    Route::post('/checkout/confirm', [ShopController::class, 'confirmCheckout'])->name('shop.confirm-checkout');
     Route::post('/process-order', [ShopController::class, 'processOrder'])->name('shop.process-order');
+    route::get('/costumer/register', [RegisterController::class, 'showCostumeRegister'])->name('shop.register');
+    route::post('/costumer/register', [RegisterController::class, 'storeCustomer'])->name('shop.register.store');
+    
+    route::get('/costumer/login', [LoginController::class, 'showCostumeLogin'])->name('shop.login');
+    route::post('/costumer/login', [LoginController::class, 'storeCustomer'])->name('shop.login.store');
+    Route::get('/profile', [ShopController::class, 'editProfile'])->name('shop.profile');
+    Route::put('/profile/update', [ShopController::class, 'updateProfile'])->name('shop.profile.update');
+        
+
+    
+    Route::post('/logout', [LoginController::class, 'destroy'])->name('shop.logout');
+    
+    Route::get('/orders', [OrderController::class, 'customerIndex'])->name('shop.orders');
+    Route::get('/orders/{id}', [OrderController::class, 'customerShow'])->name('shop.orders.show');
 });
 
-// Routes API pour le panier
-// Route::prefix('api')->group(function () {
-//     Route::post('/cart/add', [CartController::class, 'addToCart']);
-//     Route::post('/cart/update', [CartController::class, 'updateQuantity']);
-//     Route::post('/cart/remove', [CartController::class, 'removeFromCart']);
-//     Route::post('/cart/clear', [CartController::class, 'clearCart']);
-//     Route::get('/cart/count', [CartController::class, 'getCartCount']);
-// });
+// Wildcard subdomain routes for tenant shops
+// Handles requests like: pro.example.com, coder.example.com, efficace.example.com
+
+Route::domain('{subdomain}.' . config('app.tenant_domain', 'localhost'))
+    ->middleware([\App\Http\Middleware\HandleTenancy::class])
+    ->group(function () {
+        Route::get('/', [ShopController::class, 'index'])->name('shop.subdomain.index');
+        
+        Route::get('/product/{id}', [ShopController::class, 'showProduct'])->name('shop.subdomain.product');
+        
+        Route::get('/search', [ShopController::class, 'search'])->name('shop.subdomain.search');
+        
+        Route::get('/page/{slug}', [ShopController::class, 'showPage'])->name('shop.subdomain.page');
+        
+        // Cart routes
+        Route::get('/cart', [CartController::class, 'index'])->name('shop.subdomain.cart');
+        Route::post('/cart/add', [CartController::class, 'addToCart'])->name('shop.subdomain.cart.add');
+        Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('shop.subdomain.cart.update');
+        Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('shop.subdomain.cart.remove');
+        Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('shop.subdomain.cart.clear');
+        Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('shop.subdomain.cart.count');
+        
+        // Checkout routes
+        Route::get('/checkout', [ShopController::class, 'checkout'])->name('shop.subdomain.checkout');
+        Route::post('/checkout/confirm', [ShopController::class, 'confirmCheckout'])->name('shop.subdomain.confirm-checkout');
+        Route::post('/process-order', [ShopController::class, 'processOrder'])->name('shop.subdomain.process-order');
+    });

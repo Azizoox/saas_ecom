@@ -1,127 +1,184 @@
-
-
 <?php $__env->startSection('content'); ?>
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Paramètres de la boutique</h1>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-6 rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-600 to-slate-900 p-6 text-white shadow-sm">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div class="min-w-0">
+                <div class="flex items-center gap-3">
+                    <div class="grid h-12 w-12 place-items-center rounded-2xl bg-white/10 ring-1 ring-inset ring-white/15">
+                        <i class="bi bi-gear text-2xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h1 class="text-2xl md:text-3xl font-bold tracking-tight truncate mb-0">Paramètres de la boutique</h1>
+                        <p class="mt-1 text-sm text-indigo-100 mb-0">
+                            Optimise ta vitrine: identité, domaine, paiements et affichage.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="<?php echo e(url('/')); ?>" target="_blank"
+                   class="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white ring-1 ring-inset ring-white/20 hover:bg-white/15">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    Voir la boutique
+                </a>
+                <a href="<?php echo e(route('dashboard')); ?>"
+                   class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-indigo-50">
+                    <i class="bi bi-speedometer2"></i>
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
 
     <?php if(session('success')): ?>
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            <?php echo e(session('success')); ?>
-
+        <div class="mb-4 rounded-2xl bg-emerald-50 px-4 py-3 text-emerald-800 ring-1 ring-inset ring-emerald-200">
+            <div class="flex items-start gap-3">
+                <i class="bi bi-check-circle-fill mt-0.5"></i>
+                <div class="text-sm font-semibold"><?php echo e(session('success')); ?></div>
+            </div>
         </div>
     <?php endif; ?>
 
     <?php if($errors->any()): ?>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <ul>
+        <div class="mb-4 rounded-2xl bg-rose-50 px-4 py-3 text-rose-800 ring-1 ring-inset ring-rose-200">
+            <div class="flex items-start gap-3">
+                <i class="bi bi-exclamation-triangle-fill mt-0.5"></i>
+                <div class="min-w-0">
+                    <div class="text-sm font-semibold">Veuillez corriger les champs en erreur.</div>
+                    <ul class="mt-2 list-disc pl-5 text-sm space-y-1">
                 <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <li><?php echo e($error); ?></li>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
+                </div>
+            </div>
         </div>
     <?php endif; ?>
 
     <!-- Tabs Navigation -->
-    <div class="border-b border-gray-200 mb-6">
-        <nav class="-mb-px flex space-x-8">
-            <button onclick="showTab('general')" class="tab-btn border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600">
-                Informations générales
+    <div class="mb-6">
+        <div class="flex flex-wrap gap-2">
+            <button onclick="showTab(event,'general')" class="tab-btn inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm">
+                <i class="bi bi-shop"></i>
+                Général
             </button>
-            <button onclick="showTab('company')" class="tab-btn border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            <button onclick="showTab(event,'company')" class="tab-btn inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">
+                <i class="bi bi-building"></i>
                 Entreprise
             </button>
-            <button onclick="showTab('address')" class="tab-btn border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            <button onclick="showTab(event,'address')" class="tab-btn inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">
+                <i class="bi bi-geo-alt"></i>
                 Adresse
             </button>
-            <button onclick="showTab('display')" class="tab-btn border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            <button onclick="showTab(event,'display')" class="tab-btn inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">
+                <i class="bi bi-palette"></i>
                 Affichage
             </button>
-            <button onclick="showTab('payments')" class="tab-btn border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            <button onclick="showTab(event,'payments')" class="tab-btn inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">
+                <i class="bi bi-credit-card"></i>
                 Paiements
             </button>
-            <button onclick="showTab('social')" class="tab-btn border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                Réseaux sociaux
+            <button onclick="showTab(event,'social')" class="tab-btn inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">
+                <i class="bi bi-share"></i>
+                Social
             </button>
-        </nav>
+        </div>
+        <p class="mt-3 text-sm text-slate-500">
+            Astuce: fais des changements tab par tab, puis clique sur <span class="font-semibold">Enregistrer</span>.
+        </p>
     </div>
 
     <!-- General Info Tab -->
     <div id="general-tab" class="tab-content">
-        <form action="<?php echo e(route('settings.general')); ?>" method="POST" enctype="multipart/form-data" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form action="<?php echo e(route('settings.general')); ?>" method="POST" enctype="multipart/form-data" class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-6">
             <?php echo csrf_field(); ?>
             <?php echo method_field('PUT'); ?>
             
-            <h2 class="text-2xl font-bold mb-6">Informations générales</h2>
+            <div class="flex items-start justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-900 mb-1">Informations générales</h2>
+                    <p class="text-sm text-slate-500 mb-0">Nom, SEO, domaine et branding.</p>
+                </div>
+            </div>
 
-            <div class="mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
                     Nom de la boutique *
                 </label>
                 <input type="text" name="name" id="name" value="<?php echo e(old('name', $shop->name)); ?>" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
-            <div class="mb-4">
+            <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="keywords">
                     Mots-clés (SEO)
                 </label>
                 <input type="text" name="keywords" id="keywords" value="<?php echo e(old('keywords', $shop->keywords)); ?>"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="e-commerce, vente en ligne, produits">
             </div>
+            </div>
 
-            <div class="mb-4">
+            <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
                     Description
                 </label>
                 <textarea name="description" id="description" rows="3"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"><?php echo e(old('description', $shop->description)); ?></textarea>
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"><?php echo e(old('description', $shop->description)); ?></textarea>
             </div>
 
-            <div class="mb-4">
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="subdomain">
                     Sous-domaine *
                 </label>
                 <input type="text" name="subdomain" id="subdomain" value="<?php echo e(old('subdomain', $shop->subdomain)); ?>" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="monshop">
-                <p class="text-gray-600 text-xs mt-1">Ex: monshop.shopino.test</p>
+                <p class="text-slate-500 text-xs mt-1">Ex: monshop.shopino.test</p>
             </div>
 
-            <div class="mb-4">
+            <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="custom_domain">
                     Domaine personnalisé (optionnel)
                 </label>
                 <input type="text" name="custom_domain" id="custom_domain" value="<?php echo e(old('custom_domain', $shop->custom_domain)); ?>"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="www.maboutique.com">
             </div>
+            </div>
 
-            <div class="mb-4">
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="rounded-2xl bg-slate-50 ring-1 ring-inset ring-slate-200 p-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="logo">
                     Logo de la boutique
                 </label>
                 <?php if($shop->logo): ?>
-                    <img src="<?php echo e(\Illuminate\Support\Facades\Storage::url($shop->logo)); ?>" alt="Logo" class="mb-2 h-20">
+                    <img src="<?php echo e(\Illuminate\Support\Facades\Storage::url($shop->logo)); ?>" alt="Logo" class="mb-3 h-20 rounded-xl bg-white ring-1 ring-inset ring-slate-200 p-2">
                 <?php endif; ?>
                 <input type="file" name="logo" id="logo" accept="image/*"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    class="block w-full text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-indigo-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-indigo-700">
             </div>
 
-            <div class="mb-6">
+            <div class="rounded-2xl bg-slate-50 ring-1 ring-inset ring-slate-200 p-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="favicon">
                     Favicon
                 </label>
                 <?php if($shop->favicon): ?>
-                    <img src="<?php echo e(\Illuminate\Support\Facades\Storage::url($shop->favicon)); ?>" alt="Favicon" class="mb-2 h-8">
+                    <img src="<?php echo e(\Illuminate\Support\Facades\Storage::url($shop->favicon)); ?>" alt="Favicon" class="mb-3 h-10 w-10 rounded-xl bg-white ring-1 ring-inset ring-slate-200 p-2">
                 <?php endif; ?>
                 <input type="file" name="favicon" id="favicon" accept="image/*"
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    class="block w-full text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-indigo-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-indigo-700">
+            </div>
             </div>
 
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Enregistrer
-            </button>
+            <div class="mt-6 flex flex-col sm:flex-row gap-2 sm:justify-end">
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <i class="bi bi-check2"></i>
+                    Enregistrer
+                </button>
+            </div>
         </form>
     </div>
 
@@ -237,83 +294,173 @@
 
     <!-- Display Tab -->
     <div id="display-tab" class="tab-content hidden">
-        <form action="<?php echo e(route('settings.display')); ?>" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <?php
+            $currentDisplayMode = old('display_mode', $shop->settings->display_mode ?? 'light');
+            $currentPrimaryColor = old('primary_color', $shop->settings->primary_color ?? '#3490dc');
+        ?>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-8">
+                <form action="<?php echo e(route('settings.display')); ?>" method="POST" class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-6">
             <?php echo csrf_field(); ?>
             <?php echo method_field('PUT'); ?>
             
-            <h2 class="text-2xl font-bold mb-6">Affichage (Personnalisation)</h2>
+            <div class="flex items-start justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-900 mb-1">Affichage</h2>
+                    <p class="text-sm text-slate-500 mb-0">Langue, devise, thème, couleur principale et mode clair/sombre.</p>
+                </div>
+            </div>
 
-            <div class="mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="language">
                     Langue par défaut *
                 </label>
                 <select name="language" id="language" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="fr" <?php echo e(old('language', $shop->settings->language ?? 'fr') == 'fr' ? 'selected' : ''); ?>>Français</option>
                     <option value="ar" <?php echo e(old('language', $shop->settings->language ?? 'fr') == 'ar' ? 'selected' : ''); ?>>العربية</option>
                     <option value="en" <?php echo e(old('language', $shop->settings->language ?? 'fr') == 'en' ? 'selected' : ''); ?>>English</option>
                 </select>
             </div>
 
-            <div class="mb-4">
+            <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="currency">
                     Devise *
                 </label>
                 <input type="text" name="currency" id="currency" value="<?php echo e(old('currency', $shop->settings->currency ?? 'TND')); ?>" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="TND">
             </div>
+            </div>
 
-            <div class="mb-4">
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="timezone">
                     Fuseau horaire *
                 </label>
                 <input type="text" name="timezone" id="timezone" value="<?php echo e(old('timezone', $shop->settings->timezone ?? 'Africa/Tunis')); ?>" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="Africa/Tunis">
             </div>
 
-            <div class="mb-4">
+            <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="theme">
                     Thème actif *
                 </label>
                 <input type="text" name="theme" id="theme" value="<?php echo e(old('theme', $shop->settings->theme ?? 'default')); ?>" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="default">
+            </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="primary_color">
-                    Couleur principale *
-                </label>
-                <input type="color" name="primary_color" id="primary_color" value="<?php echo e(old('primary_color', $shop->settings->primary_color ?? '#3490dc')); ?>" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-12">
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="rounded-2xl bg-slate-50 ring-1 ring-inset ring-slate-200 p-4">
+                    <label class="block text-xs font-semibold uppercase tracking-wide text-slate-600 mb-2" for="primary_color">
+                        Couleur principale
+                    </label>
+                    <div class="flex items-center gap-3">
+                        <input type="color" name="primary_color" id="primary_color" value="<?php echo e($currentPrimaryColor); ?>" required
+                               class="h-12 w-16 cursor-pointer rounded-xl border border-slate-300 bg-white shadow-sm">
+                        <input type="text" id="primary_color_text" value="<?php echo e($currentPrimaryColor); ?>" readonly
+                               class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm">
+                        <button type="button" id="copyPrimaryColor"
+                                class="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-50">
+                            <i class="bi bi-clipboard"></i>
+                            Copier
+                        </button>
+                    </div>
+                    <p class="mt-2 text-xs text-slate-500 mb-0">Cette couleur personnalise automatiquement les accents du shop.</p>
+                </div>
+
+                <div class="rounded-2xl bg-white ring-1 ring-inset ring-slate-200 p-4">
+                    <div class="text-xs font-semibold uppercase tracking-wide text-slate-600 mb-2">
+                        Mode clair / sombre
+                    </div>
+
+                    <div class="grid grid-cols-3 rounded-2xl bg-slate-50 ring-1 ring-inset ring-slate-200 p-1">
+                        <label class="group cursor-pointer">
+                            <input class="sr-only" type="radio" name="display_mode" value="light" <?php if($currentDisplayMode === 'light'): echo 'checked'; endif; ?>>
+                            <span class="flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-transparent text-slate-700 group-has-[:checked]:bg-white group-has-[:checked]:text-slate-900 group-has-[:checked]:ring-slate-200">
+                                <i class="bi bi-sun"></i>
+                                Clair
+                            </span>
+                        </label>
+                        <label class="group cursor-pointer">
+                            <input class="sr-only" type="radio" name="display_mode" value="dark" <?php if($currentDisplayMode === 'dark'): echo 'checked'; endif; ?>>
+                            <span class="flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-transparent text-slate-700 group-has-[:checked]:bg-white group-has-[:checked]:text-slate-900 group-has-[:checked]:ring-slate-200">
+                                <i class="bi bi-moon"></i>
+                                Sombre
+                            </span>
+                        </label>
+                        <label class="group cursor-pointer">
+                            <input class="sr-only" type="radio" name="display_mode" value="auto" <?php if($currentDisplayMode === 'auto'): echo 'checked'; endif; ?>>
+                            <span class="flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-transparent text-slate-700 group-has-[:checked]:bg-white group-has-[:checked]:text-slate-900 group-has-[:checked]:ring-slate-200">
+                                <i class="bi bi-magic"></i>
+                                Auto
+                            </span>
+                        </label>
+                    </div>
+                    <p class="mt-2 text-xs text-slate-500 mb-0">Auto suit le système (jour/nuit) et laisse l’utilisateur basculer.</p>
+                </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2" for="display_mode">
-                    Mode clair / sombre *
-                </label>
-                <select name="display_mode" id="display_mode" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    <option value="light" <?php echo e(old('display_mode', $shop->settings->display_mode ?? 'light') == 'light' ? 'selected' : ''); ?>>Clair</option>
-                    <option value="dark" <?php echo e(old('display_mode', $shop->settings->display_mode ?? 'light') == 'dark' ? 'selected' : ''); ?>>Sombre</option>
-                    <option value="auto" <?php echo e(old('display_mode', $shop->settings->display_mode ?? 'light') == 'auto' ? 'selected' : ''); ?>>Automatique</option>
-                </select>
-            </div>
-
-            <div class="mb-6">
+            <div class="mt-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="date_format">
                     Format de date *
                 </label>
                 <input type="text" name="date_format" id="date_format" value="<?php echo e(old('date_format', $shop->settings->date_format ?? 'd/m/Y')); ?>" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="d/m/Y">
             </div>
 
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Enregistrer
-            </button>
+            <div class="mt-6 flex flex-col sm:flex-row gap-2 sm:justify-end">
+                <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <i class="bi bi-check2"></i>
+                    Enregistrer
+                </button>
+            </div>
         </form>
+            </div>
+
+            <div class="lg:col-span-4">
+                <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 overflow-hidden">
+                    <div class="px-5 py-4 border-b border-slate-200">
+                        <p class="text-sm font-semibold text-slate-900 mb-0"><i class="bi bi-eye me-2 text-slate-500"></i>Aperçu</p>
+                    </div>
+                    <div class="p-5">
+                        <div id="displayPreview" class="rounded-2xl ring-1 ring-inset ring-slate-200 overflow-hidden">
+                            <div class="p-4 bg-white text-slate-900">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="h-8 w-8 rounded-xl" id="previewAccentSwatch" style="background: <?php echo e($currentPrimaryColor); ?>;"></div>
+                                        <div class="text-sm font-semibold">Boutique</div>
+                                    </div>
+                                    <span class="text-xs text-slate-500" id="previewModeLabel"><?php echo e(strtoupper($currentDisplayMode)); ?></span>
+                                </div>
+                                <div class="mt-4 grid grid-cols-2 gap-2">
+                                    <button type="button" class="rounded-xl px-3 py-2 text-sm font-semibold text-white" id="previewPrimaryBtn"
+                                            style="background: <?php echo e($currentPrimaryColor); ?>;">
+                                        Bouton
+                                    </button>
+                                    <button type="button" class="rounded-xl px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-slate-200">
+                                        Secondaire
+                                    </button>
+                                </div>
+                                <div class="mt-4 rounded-xl bg-slate-50 ring-1 ring-inset ring-slate-200 p-3 text-xs text-slate-600">
+                                    Une preview rapide pour valider le rendu du thème.
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="mt-3 text-xs text-slate-500 mb-0">
+                            Le shop applique aussi ces réglages sur `shop/{subdomain}`.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Payments Tab -->
@@ -472,7 +619,7 @@
 </div>
 
 <script>
-function showTab(tabName) {
+function showTab(e, tabName) {
     // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.add('hidden');
@@ -480,17 +627,64 @@ function showTab(tabName) {
     
     // Remove active styling from all buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('border-blue-500', 'text-blue-600');
-        btn.classList.add('border-transparent', 'text-gray-500');
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+        btn.classList.add('bg-white', 'text-slate-700', 'ring-1', 'ring-inset', 'ring-slate-200');
     });
     
     // Show selected tab
     document.getElementById(tabName + '-tab').classList.remove('hidden');
     
     // Add active styling to clicked button
-    event.target.classList.remove('border-transparent', 'text-gray-500');
-    event.target.classList.add('border-blue-500', 'text-blue-600');
+    e.currentTarget.classList.remove('bg-white', 'text-slate-700', 'ring-1', 'ring-inset', 'ring-slate-200');
+    e.currentTarget.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const primaryColor = document.getElementById('primary_color');
+    const primaryColorText = document.getElementById('primary_color_text');
+    const copyPrimaryColor = document.getElementById('copyPrimaryColor');
+    const previewSwatch = document.getElementById('previewAccentSwatch');
+    const previewPrimaryBtn = document.getElementById('previewPrimaryBtn');
+    const previewModeLabel = document.getElementById('previewModeLabel');
+    const preview = document.getElementById('displayPreview');
+
+    function getSelectedDisplayMode() {
+        const checked = document.querySelector('input[name="display_mode"]:checked');
+        return checked ? checked.value : 'light';
+    }
+
+    function applyPreview() {
+        const color = primaryColor?.value || '#3490dc';
+        const mode = getSelectedDisplayMode();
+
+        if (primaryColorText) primaryColorText.value = color;
+        if (previewSwatch) previewSwatch.style.background = color;
+        if (previewPrimaryBtn) previewPrimaryBtn.style.background = color;
+        if (previewModeLabel) previewModeLabel.textContent = mode.toUpperCase();
+
+        if (preview) {
+            const inner = preview.querySelector('div');
+            if (inner) {
+                const dark = mode === 'dark';
+                inner.classList.toggle('bg-slate-900', dark);
+                inner.classList.toggle('text-slate-100', dark);
+                inner.classList.toggle('bg-white', !dark);
+                inner.classList.toggle('text-slate-900', !dark);
+            }
+        }
+    }
+
+    primaryColor?.addEventListener('input', applyPreview);
+    document.querySelectorAll('input[name="display_mode"]').forEach((el) => el.addEventListener('change', applyPreview));
+
+    copyPrimaryColor?.addEventListener('click', function () {
+        const value = primaryColor?.value || primaryColorText?.value;
+        if (!value) return;
+        navigator.clipboard?.writeText(value);
+    });
+
+    applyPreview();
+});
 </script>
 <?php $__env->stopSection(); ?>
 

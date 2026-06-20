@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Shop;
 use App\Models\Category;
+use App\Http\Requests\ProductRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,32 +43,10 @@ class ProductController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(ProductRequest $request): RedirectResponse
     {
         $user = Auth::user();
-        
-        $validated = $request->validate([
-            'shop_id' => ['required', 'exists:shops,id', function ($attribute, $value, $fail) use ($user) {
-                if (!$user->shops->contains('id', $value)) {
-                    $fail('Vous ne possédez pas cette boutique.');
-                }
-            }],
-            'name' => ['required', 'string', 'max:255'],
-            'reference' => ['nullable', 'string', 'max:255'],
-            'barcode' => ['nullable', 'string', 'max:255'],
-            'supplier' => ['nullable', 'string', 'max:255'],
-            'brand' => ['nullable', 'string', 'max:255'],
-            'short_description' => ['nullable', 'string', 'max:500'],
-            'description' => ['nullable', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'stock' => ['required', 'integer', 'min:0'],
-            'sku' => ['nullable', 'string', 'max:255'],
-            'meta_title' => ['nullable', 'string', 'max:255'],
-            'meta_description' => ['nullable', 'string', 'max:160'],
-            'meta_keywords' => ['nullable', 'string', 'max:255'],
-            'category_id' => ['nullable', 'exists:categories,id'],
-            'product_group_id' => ['nullable', 'exists:products,id'],
-        ]);
+        $validated = $request->validated();
 
         // Vérifier que la catégorie appartient bien à la boutique sélectionnée
         if (!empty($validated['category_id'])) {
@@ -138,7 +117,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function update(Request $request, Product $product): RedirectResponse
+    public function update(ProductRequest $request, Product $product): RedirectResponse
     {
         $user = Auth::user();
         
@@ -147,28 +126,7 @@ class ProductController extends Controller
             abort(403, 'Accès non autorisé');
         }
 
-        $validated = $request->validate([
-            'shop_id' => ['required', 'exists:shops,id', function ($attribute, $value, $fail) use ($user) {
-                if (!$user->shops->contains('id', $value)) {
-                    $fail('Vous ne possédez pas cette boutique.');
-                }
-            }],
-            'name' => ['required', 'string', 'max:255'],
-            'reference' => ['nullable', 'string', 'max:255'],
-            'barcode' => ['nullable', 'string', 'max:255'],
-            'supplier' => ['nullable', 'string', 'max:255'],
-            'brand' => ['nullable', 'string', 'max:255'],
-            'short_description' => ['nullable', 'string', 'max:500'],
-            'description' => ['nullable', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'stock' => ['required', 'integer', 'min:0'],
-            'sku' => ['nullable', 'string', 'max:255'],
-            'meta_title' => ['nullable', 'string', 'max:255'],
-            'meta_description' => ['nullable', 'string', 'max:160'],
-            'meta_keywords' => ['nullable', 'string', 'max:255'],
-            'category_id' => ['nullable', 'exists:categories,id'],
-            'product_group_id' => ['nullable', 'exists:products,id'],
-        ]);
+        $validated = $request->validated();
 
         // Vérifier que la catégorie appartient bien à la boutique sélectionnée
         if (!empty($validated['category_id'])) {

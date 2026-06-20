@@ -17,10 +17,23 @@
             </div>
 
             <?php if(session('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>
                     <?php echo e(session('success')); ?>
 
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
+
+            <?php if($errors->any()): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    <strong>Erreur:</strong>
+                    <ul class="mb-0 mt-2">
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </ul>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
@@ -96,10 +109,10 @@
                                                     <a href="<?php echo e(route('categories.edit', $category)); ?>" class="btn btn-outline-secondary" title="Modifier">
                                                         <i class="bi bi-pencil"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-outline-danger" 
-                                                            data-category-id="<?php echo e($category->id); ?>" 
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                            data-category-id="<?php echo e($category->id); ?>"
                                                             data-category-name="<?php echo e($category->name); ?>"
-                                                            onclick="confirmDelete(this.dataset.categoryId, this.dataset.categoryName)" 
+                                                            onclick="confirmDelete(this.dataset.categoryId, this.dataset.categoryName)"
                                                             title="Supprimer">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
@@ -127,6 +140,23 @@
         </div>
     </div>
 </div>
+
+<!-- Helper Scripts -->
+<script>
+// Define confirmDelete function early so it's available for inline onclick handlers
+function confirmDelete(categoryId, categoryName) {
+    if (!categoryId || !categoryName) {
+        alert('Erreur: Données invalides');
+        return;
+    }
+    
+    document.getElementById('categoryName').textContent = categoryName;
+    document.getElementById('deleteForm').action = `/categories/${categoryId}`;
+    
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    deleteModal.show();
+}
+</script>
 
 <!-- Create Category Modal -->
 <div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalLabel" aria-hidden="true">
@@ -167,15 +197,40 @@ unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
                         <div class="col-md-6">
-                         
-                            <input type="hidden"
-           class="form-control"
-           value="<?php echo e(Auth::user()->shops->first()->name); ?>"
-           readonly>
-
+                            <div class="mb-3">
+                                <label for="shop_id" class="form-label">Boutique <span class="text-danger">*</span></label>
+                                <?php if($shops->count() > 1): ?>
+                                    <select class="form-select <?php $__errorArgs = ['shop_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="shop_id" name="shop_id" required>
+                                        <option value="">Sélectionnez une boutique</option>
+                                        <?php $__currentLoopData = $shops; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $shop): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($shop->id); ?>" <?php echo e(old('shop_id') == $shop->id ? 'selected' : ''); ?>><?php echo e($shop->name); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </select>
+                                <?php else: ?>
+                                    <input type="hidden" name="shop_id" value="<?php echo e($shops->first()->id); ?>" />
+                                    <input type="text" class="form-control" value="<?php echo e($shops->first()->name); ?>" disabled>
+                                <?php endif; ?>
+                                <?php $__errorArgs = ['shop_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                            </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <textarea class="form-control <?php $__errorArgs = ['description'];
@@ -197,7 +252,7 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -211,8 +266,11 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>" id="parent_id" name="parent_id">
                                     <option value="">Aucun parent</option>
-                                    <?php $__currentLoopData = Auth::user()->shop->categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <option value="<?php echo e($cat->id); ?>" <?php echo e(old('parent_id') == $cat->id ? 'selected' : ''); ?>><?php echo e($cat->name); ?></option>
+                                    <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($cat->id); ?>" <?php echo e(old('parent_id') == $cat->id ? 'selected' : ''); ?>>
+                                            <?php echo e($cat->name); ?>
+
+                                        </option>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                                 <?php $__errorArgs = ['parent_id'];
@@ -251,7 +309,7 @@ unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -300,7 +358,7 @@ unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3 form-check d-none">
                         <input type="checkbox" class="form-check-input <?php $__errorArgs = ['is_active'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -360,16 +418,10 @@ unset($__errorArgs, $__bag); ?>
 
 <?php $__env->startSection('scripts'); ?>
 <script>
-function confirmDelete(categoryId, categoryName) {
-    document.getElementById('categoryName').textContent = categoryName;
-    document.getElementById('deleteForm').action = `/categories/${categoryId}`;
-    new bootstrap.Modal(document.getElementById('deleteModal')).show();
-}
-
 // Initialize DataTable
 $(document).ready(function() {
     $('#categoriesTable').DataTable({
-        "order": [[ 5, "asc" ]], // Order by order column
+        "order": [[ 5, "asc" ]],
         "pageLength": 25,
         "language": {
             "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
@@ -377,14 +429,37 @@ $(document).ready(function() {
     });
 });
 
-// Auto-hide success alert
-setTimeout(function() {
-    const alertElement = document.querySelector('.alert');
-    if (alertElement) {
-        const bsAlert = new bootstrap.Alert(alertElement);
-        bsAlert.close();
+// Auto-hide success/error alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alertElement => {
+        setTimeout(function() {
+            const bsAlert = new bootstrap.Alert(alertElement);
+            bsAlert.close();
+        }, 5000);
+    });
+});
+
+// Re-open modal if there were validation errors
+<?php if($errors->any() && old('name')): ?>
+    document.addEventListener('DOMContentLoaded', function() {
+        new bootstrap.Modal(document.getElementById('createCategoryModal')).show();
+    });
+<?php endif; ?>
+
+// Handle delete form submission with loading state
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteForm = document.getElementById('deleteForm');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Suppression...';
+            }
+        });
     }
-}, 3000);
+});
 </script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\ahach\OneDrive\Bureau\shoopino\resources\views/categories/index.blade.php ENDPATH**/ ?>

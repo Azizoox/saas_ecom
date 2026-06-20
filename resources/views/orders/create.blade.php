@@ -3,23 +3,43 @@
 @section('title', 'Nouvelle commande')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-plus-circle"></i> Créer une commande</h2>
-    <a href="{{ route('orders.index') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Retour
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 flex items-center gap-3">
+            <i class="bi bi-plus-circle text-blue-600"></i>
+            <span>Créer une commande</span>
+        </h1>
+        <p class="text-gray-500 mt-1">Remplissez les informations du client et ajoutez des produits</p>
+    </div>
+    <a href="{{ route('orders.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg font-semibold transition-all duration-200">
+        <i class="bi bi-arrow-left"></i>
+        <span>Retour</span>
     </a>
 </div>
 
+<!-- Error Alert -->
 @if($errors->any())
-    <div class="alert alert-danger">
-        <strong>Erreur:</strong> merci de vérifier les champs.
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+        <div class="flex items-start gap-3">
+            <i class="bi bi-exclamation-circle text-red-600 text-xl mt-0.5"></i>
+            <div>
+                <h3 class="font-bold text-red-900 mb-1">Erreur de validation</h3>
+                <ul class="list-disc list-inside text-sm text-red-700">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
     </div>
 @endif
 
-<form method="POST" action="{{ route('orders.store') }}">
+<form method="POST" action="{{ route('orders.store') }}" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     @csrf
-    <div class="row">
-        <div class="col-lg-5">
+
+    <!-- Left Column: Client & Shipping Info -->
+    <div class="lg:col-span-1">
             <div class="card mb-3">
                 <div class="card-header">
                     <strong>Client & livraison</strong>
