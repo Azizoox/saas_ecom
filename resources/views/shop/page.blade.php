@@ -3,30 +3,6 @@
 @section('title', $page->title . ' - ' . $shop->name)
 
 @section('content')
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('shop.index', ['subdomain' => $shop->subdomain]) }}">{{ $shop->name }}</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    @foreach($shop->pages()->where('is_active', true)->orderBy('order')->get() as $p)
-                    <li class="nav-item">
-                        <a class="nav-link {{ $p->id === $page->id ? 'active' : '' }}" href="{{ route('shop.page', ['subdomain' => $shop->subdomain, 'slug' => $p->slug]) }}">{{ $p->title }}</a>
-                    </li>
-                    @endforeach
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('shop.cart', ['subdomain' => $shop->subdomain]) }}">
-                            <i class="bi bi-cart3 me-1"></i> Panier
-                            <span class="badge bg-danger ms-1">{{ \App\Models\Cart::getCartCount(auth()->id()) }}</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <div class="container mt-5">
         <h1>{{ $page->title }}</h1>
         <div class="mt-4">
@@ -78,6 +54,4 @@
             </div>
         @endif
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

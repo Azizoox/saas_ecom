@@ -109,47 +109,7 @@
     </div>
 </div>
 
-<!-- Quick Actions -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 d-flex align-items-center">
-                    <i class="bi bi-lightning-fill text-primary me-2"></i>
-                    Actions rapides
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-3 col-6">
-                        <a href="<?php echo e(route('products.create')); ?>" class="btn btn-outline-primary w-100 py-3">
-                            <i class="bi bi-plus-circle d-block mb-2" style="font-size: 1.5rem;"></i>
-                            <span>Ajouter un produit</span>
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <a href="<?php echo e(route('categories.create')); ?>" class="btn btn-outline-success w-100 py-3">
-                            <i class="bi bi-tags d-block mb-2" style="font-size: 1.5rem;"></i>
-                            <span>Nouvelle catégorie</span>
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <a href="<?php echo e(route('builder.index')); ?>" class="btn btn-outline-info w-100 py-3">
-                            <i class="bi bi-layout-text-sidebar-reverse d-block mb-2" style="font-size: 1.5rem;"></i>
-                            <span>Builder page</span>
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-6">
-                        <a href="<?php echo e(route('settings.index')); ?>" class="btn btn-outline-secondary w-100 py-3">
-                            <i class="bi bi-gear d-block mb-2" style="font-size: 1.5rem;"></i>
-                            <span>Paramètres</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Shops Table -->
 <div class="row">
@@ -161,9 +121,7 @@
                         <i class="bi bi-shop-window me-2 text-primary"></i>
                         Mes boutiques
                     </h5>
-                    <a href="#" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus"></i> Nouvelle boutique
-                    </a>
+                    
                 </div>
             </div>
             <div class="card-body">
@@ -245,6 +203,178 @@
         </div>
     </div>
 </div>
+
+<!-- Charts Section -->
+<div class="row mt-4">
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up me-2 text-primary"></i>
+                    Évolution des ventes
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="salesChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart me-2 text-success"></i>
+                    Répartition des catégories
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="categoriesChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-12 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart me-2 text-info"></i>
+                    Statut des commandes
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="ordersChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 <?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sales Trend Chart
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    const salesChart = new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'],
+            datasets: [{
+                label: 'Ventes (TND)',
+                data: [12000, 19000, 15000, 18000, 22000, 19500, 24000, 21000, 26000, 23000, 28000, 31000],
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+    
+    // Categories Distribution Chart
+    const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
+    const categoriesChart = new Chart(categoriesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Électronique', 'Vêtements', 'Maison', 'Sports', 'Beauté'],
+            datasets: [{
+                data: [35, 25, 20, 12, 8],
+                backgroundColor: [
+                    '#3b82f6',
+                    '#10b981',
+                    '#8b5cf6',
+                    '#f59e0b',
+                    '#ef4444'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+    
+    // Orders Status Chart
+    const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+    const ordersChart = new Chart(ordersCtx, {
+        type: 'bar',
+        data: {
+            labels: ['En attente', 'En cours', 'Expédiées', 'Livrées', 'Annulées'],
+            datasets: [{
+                label: 'Commandes',
+                data: [12, 19, 3, 5, 2],
+                backgroundColor: [
+                    '#f59e0b',
+                    '#3b82f6',
+                    '#10b981',
+                    '#8b5cf6',
+                    '#ef4444'
+                ],
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+<?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\ahach\OneDrive\Bureau\shoopino\resources\views/dashboard/index.blade.php ENDPATH**/ ?>

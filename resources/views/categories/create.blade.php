@@ -50,7 +50,7 @@
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Nom de la catégorie *</label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                           id="name" name="name" value="{{ old('name') }}" required>
+                                           id="name" name="name" value="{{ old('name') }}" required autocomplete="off">
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -61,7 +61,7 @@
                                 <div class="mb-3">
                                     <label for="shop_id" class="form-label">Boutique *</label>
                                     <select class="form-select @error('shop_id') is-invalid @enderror" 
-                                            id="shop_id" name="shop_id" required>
+                                            id="shop_id" name="shop_id" required autocomplete="off">
                                         <option value="">Sélectionnez une boutique</option>
                                         @foreach($shops as $shop)
                                             <option value="{{ $shop->id }}" {{ old('shop_id') == $shop->id ? 'selected' : '' }}>
@@ -99,7 +99,7 @@
                                 <div class="mb-3">
                                     <label for="order" class="form-label">Ordre d'affichage</label>
                                     <input type="number" class="form-control @error('order') is-invalid @enderror" 
-                                           id="order" name="order" value="{{ old('order', 0) }}" min="0">
+                                           id="order" name="order" value="{{ old('order', 0) }}" min="0" autocomplete="off">
                                     @error('order')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -110,7 +110,7 @@
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
                             <textarea class="form-control @error('description') is-invalid @enderror" 
-                                      id="description" name="description" rows="3">{{ old('description') }}</textarea>
+                                      id="description" name="description" rows="3" autocomplete="off">{{ old('description') }}</textarea>
                             @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -121,7 +121,7 @@
                                 <div class="mb-3">
                                     <label for="icon" class="form-label">Icône (2MB max)</label>
                                     <input type="file" class="form-control @error('icon') is-invalid @enderror" 
-                                           id="icon" name="icon" accept="image/*">
+                                           id="icon" name="icon" accept="image/*" autocomplete="off">
                                     <div class="form-text">Formats acceptés: JPG, PNG, SVG, GIF</div>
                                     @error('icon')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -133,7 +133,7 @@
                                 <div class="mb-3">
                                     <label for="image" class="form-label">Image (5MB max)</label>
                                     <input type="file" class="form-control @error('image') is-invalid @enderror" 
-                                           id="image" name="image" accept="image/*">
+                                           id="image" name="image" accept="image/*" autocomplete="off">
                                     <div class="form-text">Formats acceptés: JPG, PNG, SVG, GIF</div>
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>

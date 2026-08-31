@@ -3,87 +3,120 @@
 @section('title', 'Facture')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="mb-0"><i class="bi bi-receipt"></i> {{ $invoice->invoice_number }}</h2>
-        <small class="text-muted">Commande: {{ $order->order_number }} — Date: {{ $invoice->issued_at?->format('d/m/Y') }}</small>
-    </div>
-    <div class="d-flex gap-2">
-        <a href="{{ route('orders.show', $order) }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Retour commande
-        </a>
-        <a href="{{ route('invoices.pdf', $order) }}" class="btn btn-danger">
-            <i class="bi bi-file-earmark-pdf"></i> Télécharger PDF
-        </a>
-        <a href="#" class="btn btn-outline-secondary" onclick="window.print(); return false;">
-            <i class="bi bi-printer"></i> Imprimer
-        </a>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h5>Boutique</h5>
-                <div><strong>{{ $order->shop->company_name ?: $order->shop->name }}</strong></div>
-                <div class="text-muted">{{ $order->shop->street }}</div>
-                <div class="text-muted">{{ $order->shop->city }} {{ $order->shop->postal_code }}</div>
-                <div class="text-muted">{{ $order->shop->contact_email }}</div>
-                <div class="text-muted">{{ $order->shop->contact_phone }}</div>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <h5>Client</h5>
-                <div><strong>{{ $order->customer_name ?? '—' }}</strong></div>
-                <div class="text-muted">{{ $order->customer_email ?? '' }}</div>
-                <div class="text-muted">{{ $order->customer_phone ?? '' }}</div>
-                <div class="text-muted mt-2">
-                    {{ $order->shipping_address }}<br>
-                    {{ $order->shipping_city }} {{ $order->shipping_postal_code }}<br>
-                    {{ $order->shipping_country }}
+<div class="mx-auto max-w-7xl">
+    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
+        <div class="min-w-0">
+            <div class="flex items-center gap-3">
+                <div class="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-white shadow-sm">
+                    <i class="bi bi-receipt text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <h2 class="text-xl md:text-2xl font-semibold tracking-tight text-slate-900 truncate">
+                        {{ $invoice->invoice_number }}
+                    </h2>
+                    <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-slate-500">
+                        <span>Commande: <span class="font-medium text-slate-700">{{ $order->order_number }}</span></span>
+                        <span class="hidden sm:inline">•</span>
+                        <span>Date: {{ $invoice->issued_at?->format('d/m/Y') }}</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <hr>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('orders.show', $order) }}"
+               class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-200 hover:bg-slate-50">
+                <i class="bi bi-arrow-left"></i>
+                Retour commande
+            </a>
+            <a href="#" onclick="window.print(); return false;"
+               class="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-200 hover:bg-slate-50">
+                <i class="bi bi-printer"></i>
+                Imprimer
+            </a>
+            <a href="{{ route('invoices.pdf', $order) }}"
+               class="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-700">
+                <i class="bi bi-file-earmark-pdf"></i>
+                Télécharger PDF
+            </a>
+        </div>
+    </div>
 
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Produit</th>
-                        <th class="text-end">Prix</th>
-                        <th class="text-end">Qté</th>
-                        <th class="text-end">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($order->items as $item)
-                        <tr>
-                            <td>{{ $item->product_name }}</td>
-                            <td class="text-end">{{ number_format($item->unit_price, 2, ',', ' ') }} TND</td>
-                            <td class="text-end">{{ $item->quantity }}</td>
-                            <td class="text-end">{{ number_format($item->line_total, 2, ',', ' ') }} TND</td>
+    <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 overflow-hidden">
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="rounded-xl bg-slate-50 ring-1 ring-inset ring-slate-200 p-5">
+                    <div class="flex items-center gap-2">
+                        <i class="bi bi-shop text-slate-500"></i>
+                        <h5 class="text-sm font-semibold text-slate-900 mb-0">Boutique</h5>
+                    </div>
+                    <div class="mt-3 text-sm text-slate-700 space-y-1">
+                        <div class="font-semibold text-slate-900">{{ $order->shop->company_name ?: $order->shop->name }}</div>
+                        <div class="text-slate-600">{{ $order->shop->street }}</div>
+                        <div class="text-slate-600">{{ $order->shop->city }} {{ $order->shop->postal_code }}</div>
+                        <div class="text-slate-600">{{ $order->shop->contact_email }}</div>
+                        <div class="text-slate-600">{{ $order->shop->contact_phone }}</div>
+                    </div>
+                </div>
+
+                <div class="rounded-xl bg-slate-50 ring-1 ring-inset ring-slate-200 p-5 md:text-right">
+                    <div class="flex items-center gap-2 md:justify-end">
+                        <i class="bi bi-person text-slate-500"></i>
+                        <h5 class="text-sm font-semibold text-slate-900 mb-0">Client</h5>
+                    </div>
+                    <div class="mt-3 text-sm text-slate-700 space-y-1">
+                        <div class="font-semibold text-slate-900">{{ $order->customer_name ?? '—' }}</div>
+                        <div class="text-slate-600">{{ $order->customer_email ?? '' }}</div>
+                        <div class="text-slate-600">{{ $order->customer_phone ?? '' }}</div>
+                        <div class="pt-2 text-slate-600">
+                            {{ $order->shipping_address }}<br>
+                            {{ $order->shipping_city }} {{ $order->shipping_postal_code }}<br>
+                            {{ $order->shipping_country }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="my-6 h-px bg-slate-200"></div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead class="text-xs uppercase tracking-wide text-slate-500">
+                        <tr class="border-b border-slate-200">
+                            <th class="py-3 pr-4 text-left font-semibold">Produit</th>
+                            <th class="py-3 px-4 text-right font-semibold">Prix</th>
+                            <th class="py-3 px-4 text-right font-semibold">Qté</th>
+                            <th class="py-3 pl-4 text-right font-semibold">Total</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        @foreach($order->items as $item)
+                            <tr class="hover:bg-slate-50/60">
+                                <td class="py-4 pr-4 text-slate-900 font-medium">{{ $item->product_name }}</td>
+                                <td class="py-4 px-4 text-right whitespace-nowrap text-slate-700">{{ number_format($item->unit_price, 2, ',', ' ') }} TND</td>
+                                <td class="py-4 px-4 text-right whitespace-nowrap text-slate-700">{{ $item->quantity }}</td>
+                                <td class="py-4 pl-4 text-right whitespace-nowrap font-semibold text-slate-900">{{ number_format($item->line_total, 2, ',', ' ') }} TND</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="d-flex justify-content-end">
-            <div style="min-width: 280px;">
-                <div class="d-flex justify-content-between">
-                    <span>Sous-total</span>
-                    <strong>{{ number_format($invoice->subtotal ?? 0, 2, ',', ' ') }} TND</strong>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <span>Taxes</span>
-                    <strong>{{ number_format($invoice->tax_total ?? 0, 2, ',', ' ') }} TND</strong>
-                </div>
-                <hr class="my-2">
-                <div class="d-flex justify-content-between">
-                    <span>Total</span>
-                    <strong>{{ number_format($invoice->total ?? 0, 2, ',', ' ') }} TND</strong>
+            <div class="mt-6 flex justify-end">
+                <div class="w-full max-w-sm rounded-xl bg-slate-50 ring-1 ring-inset ring-slate-200 p-4">
+                    <div class="flex items-center justify-between text-sm text-slate-600">
+                        <span>Sous-total</span>
+                        <span class="font-semibold text-slate-900">{{ number_format($invoice->subtotal ?? 0, 2, ',', ' ') }} TND</span>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-sm text-slate-600">
+                        <span>Taxes</span>
+                        <span class="font-semibold text-slate-900">{{ number_format($invoice->tax_total ?? 0, 2, ',', ' ') }} TND</span>
+                    </div>
+                    <div class="my-3 h-px bg-slate-200"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-semibold text-slate-900">Total</span>
+                        <span class="text-base font-bold tracking-tight text-slate-900">{{ number_format($invoice->total ?? 0, 2, ',', ' ') }} TND</span>
+                    </div>
                 </div>
             </div>
         </div>

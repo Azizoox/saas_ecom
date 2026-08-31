@@ -1,0 +1,54 @@
+<?php
+
+use App\Models\Conversation;
+use Illuminate\Support\Facades\Http;
+use Safe\json;
+// app/Services/ChatService.php
+class ChatService {
+
+    public function sendMessage(Conversation $conversation, string $userInput): string
+    {
+        // 1. Sauvegarder le message utilisateur
+        $conversation->messages()->create(['role' => 'user', 'content' => $userInput]);
+
+        // 2. Construire le contexte e-commerce
+        $systemPrompt = $this->buildSystemPrompt($conversation);
+
+        // 3. Récupérer l'historique
+        $history = $conversation->messages->map(fn($m) => [
+            'role'    => $m->role,
+            'content' => $m->content,
+        ])->toArray();
+
+        // 4. Appeler l'API IA
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . config('services.openai.key'),
+            'Content-Type'  => 'application/json',
+        ])->post('https://api.openai.com/v1/chat/completions', [
+            'model'    => 'gpt-4o',
+            'messages' => array_merge([['role' => 'system', 'content' => $systemPrompt]], $history),
+        ]);
+
+        $reply = $response->json('choices.0.message.content');
+
+        // 5. Sauvegarder la réponse
+        $conversation->messages()->create(['role' => 'assistant', 'content' => $reply]);
+
+        return $reply;
+    }
+
+    private function buildSystemPrompt(Conversation $conversation): string
+    {
+        $user = auth()->user();
+        $cart = session('cart', []);
+
+        return "Tu es l'assistant de la boutique MaBoutique.fr. Tu aides les clients à trouver des produits, suivre leurs commandes et répondre à leurs questions.
+        
+Contexte client : " . ($user ? "Connecté en tant que {$user->name}." : "Visiteur anonyme.") . "
+Panier : " . count($cart) . " article(s).
+Règles : Réponds toujours en français. Ne donne jamais de fausses informations sur les stocks.";
+    }
+}
+
+
+?>

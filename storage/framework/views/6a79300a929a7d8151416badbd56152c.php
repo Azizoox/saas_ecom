@@ -1,1 +1,0 @@
-<?php /**PATH C:\Users\ahach\OneDrive\Bureau\shoopino\resources\views\shop\components\text.blade.php ENDPATH**/ ?>

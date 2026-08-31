@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('cash_registers', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('location')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->decimal('opening_balance', 10, 2)->default(0);
             $table->timestamps();
         });
     }

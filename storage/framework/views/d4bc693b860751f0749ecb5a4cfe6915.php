@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', ($currentCategory ? $currentCategory->name . ' - ' : '') . $shop->name); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -57,33 +55,7 @@
     <?php endif; ?>
 
     <!-- Category Navigation -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-tags me-2"></i>
-                        Catégories
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="<?php echo e(route('shop.index', ['subdomain' => $shop->subdomain])); ?>" 
-                           class="btn btn-sm <?php echo e(!$currentCategory ? 'btn-primary' : 'btn-outline-primary'); ?>">
-                            Tous les produits
-                        </a>
-                        <?php $__currentLoopData = $shop->categories()->where('is_active', true)->orderBy('order')->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <a href="<?php echo e(route('shop.index', ['subdomain' => $shop->subdomain, 'category' => $category->slug])); ?>" 
-                               class="btn btn-sm <?php echo e(($currentCategory && $currentCategory->id === $category->id) ? 'btn-primary' : 'btn-outline-primary'); ?>">
-                                <?php echo e($category->name); ?>
-
-                            </a>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+   
 
     <!-- Products Grid -->
     <?php if($products->count() > 0): ?>
@@ -193,26 +165,6 @@
         </div>
     <?php endif; ?>
 </div>
-
-<style>
-.hover-lift {
-    transition: transform 0.2s ease-in-out;
-}
-
-.hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.product-card {
-    transition: all 0.2s ease-in-out;
-}
-
-.product-card:hover {
-    transform: translateY(-2px);
-}
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Add to cart functionality

@@ -35,22 +35,7 @@
                             <h5 class="card-title mb-0"><i class="bi bi-info-circle"></i> Informations générales</h5>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <label for="shop_id" class="form-label">Boutique <span class="text-danger">*</span></label>
-                                <select class="form-select @error('shop_id') is-invalid @enderror" id="shop_id" name="shop_id" required>
-                                    <option value="">Sélectionner une boutique</option>
-                                    @foreach($shops as $shop)
-                                        <option value="{{ $shop->id }}" {{ old('shop_id', $product->shop_id) == $shop->id ? 'selected' : '' }}>
-                                            {{ $shop->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('shop_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                          <input type="hidden" name="shop_id" value="{{ Auth::user()->shop->id }}">
 
                             <div class="mb-3">
                                 <label for="category_id" class="form-label">Catégorie</label>
@@ -60,7 +45,7 @@
                                         <option value="{{ $category->id }}" 
                                             data-shop-id="{{ $category->shop_id }}"
                                             {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                            [{{ $category->shop->name ?? 'N/A' }}] {{ $category->name }}
+                                             {{ $category->name }}
                                         </option>
                                     @endforeach
                                 </select>

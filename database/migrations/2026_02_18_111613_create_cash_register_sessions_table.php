@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('cash_register_sessions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('cash_register_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->timestamp('opened_at');
+            $table->timestamp('closed_at')->nullable();
+            $table->decimal('opening_balance', 10, 2);
+            $table->decimal('expected_closing_balance', 10, 2)->nullable();
+            $table->decimal('actual_closing_balance', 10, 2)->nullable();
+            $table->decimal('difference', 10, 2)->nullable();
+            $table->string('status')->default('open'); // open, closed
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

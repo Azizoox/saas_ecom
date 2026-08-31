@@ -14,8 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         // Run seeders in order
         $this->call([
-            CategorySeeder::class,
-            ProductSeeder::class,
+            SuperAdminSeeder::class,
+            // CategorySeeder::class,
+            // CashRegisterSeeder::class,
         ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\OrderStatusHistory;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -201,6 +202,66 @@ class OrderController extends Controller
         });
 
         return back()->with('success', 'Statut mis à jour.');
+    }
+
+    public function customerIndex(Request $request): View
+    {
+        $shop = app('shop');
+        $user = Auth::user();
+        
+        $query = Order::query()
+            ->where('customer_email', $user->email)
+            ->with('shop')
+            ->orderByDesc('created_at');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->string('status')->toString());
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date('date_from'));
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date('date_to'));
+        }
+
+        if ($request->filled('q')) {
+            $q = $request->string('q')->toString();
+            $query->where('order_number', 'like', "%{$q}%");
+        }
+
+        $orders = $query->paginate(15)->withQueryString();
+
+        return view('shop.mescommandes', [
+            'orders' => $orders,
+            'shop' => $shop,
+            'statuses' => Order::allowedStatuses(),
+            'filters' => $request->only(['status', 'date_from', 'date_to', 'q']),
+        ]);
+    }
+
+    public function customerShow($id): View
+    {
+        $shop = app('shop');
+       
+        $user = Auth::user();
+        $order = Order::where('id', $id)
+            ->where('shop_id', $shop->id)
+            ->firstOrFail();
+        
+        // Verify that this order belongs to the current customer
+        if ($order->customer_email !== $user->email) {
+            abort(403, 'Accès non autorisé');
+        }
+
+        $order->load(['shop', 'items', 'statusHistories.changedBy', 'invoice', 'pickup', 'packing', 'returnRequest']);
+
+        return view('shop.mescommandes-show', [
+            'order' => $order,
+            'shop' => $shop,
+            'statuses' => Order::allowedStatuses(),
+        ]);
     }
 }
 

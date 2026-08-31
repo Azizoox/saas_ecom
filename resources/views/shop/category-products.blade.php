@@ -56,32 +56,7 @@
     @endif
 
     <!-- Category Navigation -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-tags me-2"></i>
-                        Catégories
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('shop.index', ['subdomain' => $shop->subdomain]) }}" 
-                           class="btn btn-sm {{ !$currentCategory ? 'btn-primary' : 'btn-outline-primary' }}">
-                            Tous les produits
-                        </a>
-                        @foreach($shop->categories()->where('is_active', true)->orderBy('order')->get() as $category)
-                            <a href="{{ route('shop.index', ['subdomain' => $shop->subdomain, 'category' => $category->slug]) }}" 
-                               class="btn btn-sm {{ ($currentCategory && $currentCategory->id === $category->id) ? 'btn-primary' : 'btn-outline-primary' }}">
-                                {{ $category->name }}
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+   
 
     <!-- Products Grid -->
     @if($products->count() > 0)
@@ -186,26 +161,6 @@
         </div>
     @endif
 </div>
-
-<style>
-.hover-lift {
-    transition: transform 0.2s ease-in-out;
-}
-
-.hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.product-card {
-    transition: all 0.2s ease-in-out;
-}
-
-.product-card:hover {
-    transform: translateY(-2px);
-}
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Add to cart functionality

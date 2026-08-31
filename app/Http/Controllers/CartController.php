@@ -19,8 +19,9 @@ class CartController extends Controller
         
         $cartItems = Cart::getCartItems(Auth::id());
         $totalPrice = Cart::getTotalPrice(Auth::id());
+        $displayMode = $shop->settings?->display_mode ?? 'light';
         
-        return view('shop.cart', compact('cartItems', 'totalPrice', 'shop'));
+        return view('shop.cart', compact('cartItems', 'totalPrice', 'shop', 'displayMode'));
     }
 
     public function addToCart(Request $request)
@@ -109,12 +110,12 @@ class CartController extends Controller
         ]);
     }
 
-    public function getCartCount()
+    public function getCartCount($subdomain)
     {
-        $count = Cart::getCartCount(Auth::id());
-        
-        return response()->json([
-            'count' => $count
-        ]);
+        $count = auth()->check() 
+            ? Cart::getCartCount(auth()->id()) 
+            : 0;
+            
+        return response()->json(['count' => $count]);
     }
 }

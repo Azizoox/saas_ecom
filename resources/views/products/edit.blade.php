@@ -26,15 +26,18 @@
             @csrf
             @method('PUT')
 
+            <!-- Boutique du produit -->
             <div class="mb-3">
                 <label for="shop_id" class="form-label">Boutique <span class="text-danger">*</span></label>
                 <select class="form-select @error('shop_id') is-invalid @enderror" id="shop_id" name="shop_id" required>
                     <option value="">Sélectionner une boutique</option>
-                    @foreach($shops as $shop)
+                    @forelse($shops ?? [] as $shop)
                         <option value="{{ $shop->id }}" {{ old('shop_id', $product->shop_id) == $shop->id ? 'selected' : '' }}>
                             {{ $shop->name }}
                         </option>
-                    @endforeach
+                    @empty
+                        <option value="{{ $product->shop_id }}" selected>{{ $product->shop->name }}</option>
+                    @endforelse
                 </select>
                 @error('shop_id')
                     <span class="invalid-feedback" role="alert">
